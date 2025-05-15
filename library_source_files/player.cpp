@@ -54,6 +54,7 @@ void world::player::timeUp(float time) {
         xSpeed = 0;
         if (facingUp){
             ySpeed = 200;
+            grounded = false;
         } else if (facingDown){
             ySpeed = -200;
         } else{
