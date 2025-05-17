@@ -8,9 +8,9 @@ find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
 option(USE_VERSION_A "Use Version A of the project" ON)
 if(USE_VERSION_A)  # version with library
     set(SRC_FILES
-            main.cpp
-            view.cpp
-            game.cpp
+            main_source_files/main.cpp
+            visual_source_files/view.cpp
+            main_source_files/game.cpp
             entity.cpp
             hitbox.cpp
             entitycamera.cpp
@@ -20,29 +20,29 @@ if(USE_VERSION_A)  # version with library
             world.cpp
             singletons.cpp
             abstractFactory.cpp
-            viewEntity.cpp
+            visual_source_files/viewEntity.cpp
             player.cpp
-            concreteFactory.cpp
+            visual_source_files/concreteFactory.cpp
     )
 else() # version without library
     set(SRC_FILES
-            main.cpp
-            view.cpp
-            game.cpp
-            library_source_files/entity.cpp
-            library_source_files/hitbox.cpp
-            library_source_files/entitycamera.cpp
-            library_source_files/stopwatch.cpp
-            library_source_files/rng.cpp
-            library_source_files/world.cpp
-            library_source_files/singletons.cpp
-            library_source_files/abstractFactory.cpp
-            concreteFactory.cpp
-            library_source_files/player.cpp
-            viewEntity.cpp
-            concreteCamera.cpp
-            library_source_files/stationaryObject.cpp
-            library_source_files/stationaryObject.h
+            main_source_files/main.cpp
+            visual_source_files/view.cpp
+            main_source_files/game.cpp
+            world_source_files/entity.cpp
+            world_source_files/hitbox.cpp
+            world_source_files/entitycamera.cpp
+            world_source_files/stopwatch.cpp
+            world_source_files/rng.cpp
+            world_source_files/world.cpp
+            world_source_files/singletons.cpp
+            world_source_files/abstractFactory.cpp
+            visual_source_files/concreteFactory.cpp
+            world_source_files/player.cpp
+            visual_source_files/viewEntity.cpp
+            visual_source_files/concreteCamera.cpp
+            world_source_files/stationaryObject.cpp
+            world_source_files/stationaryObject.h
     )
 endif()
 
