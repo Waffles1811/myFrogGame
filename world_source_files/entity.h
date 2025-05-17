@@ -27,7 +27,7 @@ namespace world {
         std::shared_ptr<world::rectHitbox> getHitbox();
         void setpCam(std::shared_ptr<entitycamera> newCam);
         virtual void timeUp(float time) = 0;
-
+        virtual int handleCollision(int id);
     };
 }
 

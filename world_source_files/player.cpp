@@ -5,6 +5,7 @@
 #include "player.h"
 #include <cmath>
 #include <iostream>
+#include <utility>
 enum player_consts{
     walkSpeed = 400,
     walkAcceleration = 700,
@@ -14,14 +15,95 @@ enum player_consts{
     dashSpeed = 700
 };
 
+
+
 world::player::player() : entity(0, 0) {
     hitbox = std::make_shared<world::rectHitbox>(48.7, 60.1, false);
-    xSpeed = ySpeed = dashTime = dashDirection = 0;
-    grounded = goingRight = goingLeft = inDash = facingUp = facingDown = false;
-    canDash = true;
+}
+
+void world::player::initialize(){
+    std::weak_ptr<player> this_pointer = shared_from_this();
+    movement = std::make_shared<playerMovement>(this_pointer);
+    inputHandling = std::make_shared<inputHandler>(movement);
+    collisionFixer = std::make_shared<collisionHandler>(movement, this_pointer);
 }
 
 void world::player::timeUp(float time) {
+    movement->timeUp(time);
+
+    x += time * movement->xSpeed;
+    y += time * movement->ySpeed;
+
+    hitbox->setX(x);
+    hitbox->setY(y);
+
+    if (y < -600){ // hard coded to float at bottom of screen for now
+        movement->land(-600);
+    }
+
+    positionCamera->updateCoords(x, y);
+}
+
+void world::player::die() {
+     // add respawning later
+}
+
+void world::player::processInput(enum movement input) {
+    inputHandling->processInput(input);
+}
+
+void world::player::handleCollision(int id, const std::shared_ptr<entity>& hitobject) {
+    collisionFixer->handleCollision(id, hitobject);
+}
+
+void world::inputHandler::processInput(enum movement input) {
+    switch (input){
+        case movement::moveRight:
+            movement.lock()->goRight();
+            break;
+        case movement::faceDown:
+            movement.lock()->faceDown();
+            break;
+        case movement::moveLeft:
+            movement.lock()->goLeft();
+            break;
+        case movement::faceUp:
+            movement.lock()->faceUp();
+            break;
+        case movement::jump:
+            movement.lock()->jump();
+            break;
+        case movement::dash:
+            movement.lock()->dash();
+            break;
+        case movement::wallCling:
+            movement.lock()->clingToWall();
+            break;
+        case movement::stopRight:
+            movement.lock()->stopRight();
+            break;
+        case movement::stopDown:
+            movement.lock()->stopDown();
+            break;
+        case movement::stopLeft:
+            movement.lock()->stopLeft();
+            break;
+        case movement::stopUp:
+            movement.lock()->stopUp();
+            break;
+        case movement::stopCling:
+            movement.lock()->releaseWall();
+            break;
+
+
+
+    }
+
+}
+
+world::inputHandler::inputHandler(std::weak_ptr<playerMovement> _movement) : movement(_movement) {}
+
+void world::playerMovement::timeUp(float time) {
     if (not grounded){
         ySpeed -= gravity * time;
     }
@@ -65,95 +147,80 @@ void world::player::timeUp(float time) {
             wallClinging = false;
         }
     }
-
-    x += time * xSpeed;
-    y += time * ySpeed;
-
-    hitbox->setX(x);
-    hitbox->setY(y);
-
-    if (y < -600){ // hard coded to float at bottom of screen for now
-        land(-600);
-    }
-    positionCamera->updateCoords(x, y);
 }
 
-void world::player::die() {
-    return; // add respawning later
-}
-
-void world::player::goLeft() {
+void world::playerMovement::goLeft() {
     goingLeft = true;
     goingRight = false;
 
 }
 
-void world::player::goRight(){
+void world::playerMovement::goRight(){
     goingLeft = false;
     goingRight = true;
 
 }
 
-void world::player::stopLeft(){
+void world::playerMovement::stopLeft(){
     goingLeft = false;
 }
 
-void world::player::stopRight(){
+void world::playerMovement::stopRight(){
     goingRight = false;
 }
 
-void world::player::hitWall(float length, bool left) {
-    if (left and not goingRight){
+void world::playerMovement::boinkHead() {
+    ySpeed = 0;
+}
+
+void world::playerMovement::hitWall(float length, bool left) {
+    if ((left and not goingRight) or (not left and not goingLeft)){
         xSpeed = 0;
         touchingWall = true;
-        x = length;
-    } else if (not left and not goingLeft){
-        xSpeed = 0;
-        touchingWall = true;
-        x = length;
+        player_entity.lock()->setXCoord(length);
     }
 }
 
-void world::player::noWall() {
+void world::playerMovement::noWall() {
     touchingWall = false;
 }
 
-void world::player::clingToWall() {
+void world::playerMovement::clingToWall() {
     if (wallClingTime > 0) {
         wallClinging = true;
     }
 }
 
-void world::player::releaseWall() {
+void world::playerMovement::releaseWall() {
     wallClinging = false;
 }
 
-void world::player::faceUp(){
+void world::playerMovement::faceUp(){
     facingUp = true;
 }
 
-void world::player::faceDown(){
+void world::playerMovement::faceDown(){
     facingDown = true;
 }
 
-void world::player::stopUp(){
+void world::playerMovement::stopUp(){
     facingUp = false;
 }
 
-void world::player::stopDown(){
+void world::playerMovement::stopDown(){
     facingDown = false;
 }
 
-void world::player::jump(){
+void world::playerMovement::jump(){
     if (grounded){
         ySpeed += jumpSpeed;
     }
     grounded = false;
 }
 
-void world::player::land(float height) {
+void world::playerMovement::land(float height) {
     if (ySpeed < 0) {
-        y = height;
+        player_entity.lock()->setYCoord(height);
         ySpeed = 0;
         grounded = true;
         canDash = true;
@@ -161,11 +228,13 @@ void world::player::land(float height) {
     }
 }
 
-void world::player::fall() {
-    grounded = false;
+void world::playerMovement::fall() {
+    if (player_entity.lock()->getYCoord()>-600) {
+        grounded = false;
+    }
 }
 
-void world::player::dash(){
+void world::playerMovement::dash(){
     if (not canDash){
         return;
     }
@@ -203,7 +272,7 @@ void world::player::dash(){
     }
 }
 
-void world::player::endDash(){
+void world::playerMovement::endDash(){
     inDash = false;
     if (ySpeed > 0){
         ySpeed = 300;
@@ -222,4 +291,35 @@ void world::player::endDash(){
     }
 }
 
+world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : player_entity(_player_entity) {}
 
+
+void world::collisionHandler::handleCollision(int id, const std::shared_ptr<entity>& hitobject) {
+    id = hitobject->handleCollision(id); // for object that allow you to go trough them or sum
+    switch (id) {
+        case 0:
+            movement.lock()->fall();
+            movement.lock()->noWall();
+            break;
+        case 1: // from above
+            movement.lock()->land(hitobject->getHitbox()->getUpY() + player_entity.lock()->getHitbox()->height);
+            break;
+        case 2: // from below
+            movement.lock()->boinkHead();
+            break;
+        case 3: // left (off player)
+            movement.lock()->hitWall(hitobject->getHitbox()->getRightX(), true);
+            break;
+        case 4: // right (off player)
+            movement.lock()->hitWall(hitobject->getHitbox()->getLeftX()
+                                                - player_entity.lock()->getHitbox()->length, false);
+            break;
+        case 5:
+            player_entity.lock()->die();
+        default:
+            break;
+    }
+}
+
+world::collisionHandler::collisionHandler(std::weak_ptr<playerMovement> _movement, std::weak_ptr<player> _player_entity)
+    : movement(std::move(_movement)), player_entity(std::move(_player_entity)){}

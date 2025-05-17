@@ -20,6 +20,8 @@ float world::entity::getYCoord() const {
     return y;
 }
 
+
+
 std::shared_ptr<world::rectHitbox> world::entity::getHitbox() {
     return hitbox;
 }
@@ -30,3 +32,8 @@ void world::entity::setXCoord(float _x) {
 void world::entity::setYCoord(float _y) {
     y = _y;
 }
+
+int world::entity::handleCollision(int id) {
+    return id;
+}
+

@@ -35,34 +35,34 @@ void game::processInputs() {
                 // instead it sets a variable to true which moves the player
                 if (event.key.code == sf::Keyboard::Left or event.key.code == sf::Keyboard::A) {
                     // ^ maybe change this back to scancode on windows, didn't work on linux for me
-                    world->goLeft();
+                    world->processInputs(movement::moveLeft);
                 } else if (event.key.code == sf::Keyboard::Right or event.key.code == sf::Keyboard::D) {
-                    world->goRight();
+                    world->processInputs(movement::moveRight);
                 } else if (event.key.code == sf::Keyboard::Up or event.key.code == sf::Keyboard::W){
-                    world->faceUp();
+                    world->processInputs(movement::faceUp);
                 } else if (event.key.code == sf::Keyboard::Down or event.key.code == sf::Keyboard::S){
-                    world->faceDown();
+                    world->processInputs(movement::faceDown);
                 } else if (event.key.code == sf::Keyboard::Space){
-                    world->jump();
+                    world->processInputs(movement::jump);
                 } else if (event.key.code == sf::Keyboard::LShift){
-                    world->dash();
+                    world->processInputs(movement::dash);
                 } else if (event.key.code == sf::Keyboard::Q){
-                    world->clingToWall();
+                    world->processInputs(movement::wallCling);
                 }
 
                 break;
             case sf::Event::KeyReleased:
                 // sets the variable to false again if the key isn't being pressed anymore
                 if (event.key.code == sf::Keyboard::Left or event.key.code == sf::Keyboard::A) {
-                    world->stopLeft();
+                    world->processInputs(movement::stopLeft);
                 } else if (event.key.code == sf::Keyboard::Right or event.key.code == sf::Keyboard::D) {
-                    world->stopRight();
+                    world->processInputs(movement::stopRight);
                 } else if (event.key.code == sf::Keyboard::Up or event.key.code == sf::Keyboard::W){
-                    world->stopUp();
+                    world->processInputs(movement::stopUp);
                 } else if (event.key.code == sf::Keyboard::Down or event.key.code == sf::Keyboard::S) {
-                    world->stopDown();
+                    world->processInputs(movement::stopDown);
                 } else if (event.key.code == sf::Keyboard::Q){
-                    world->releaseWall();
+                    world->processInputs(movement::stopCling);
                 }
                 break;
             case sf::Event::Closed:

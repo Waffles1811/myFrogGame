@@ -23,6 +23,8 @@ if(USE_VERSION_A)  # version with library
             visual_source_files/viewEntity.cpp
             player.cpp
             visual_source_files/concreteFactory.cpp
+            object.cpp
+            object.h
     )
 else() # version without library
     set(SRC_FILES
@@ -43,6 +45,8 @@ else() # version without library
             visual_source_files/concreteCamera.cpp
             world_source_files/stationaryObject.cpp
             world_source_files/stationaryObject.h
+            world_source_files/object.cpp
+            world_source_files/object.h
     )
 endif()
 

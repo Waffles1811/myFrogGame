@@ -1,15 +1,32 @@
 This project is just meant to be a small unoriginal platforming game
 for me to have fun developing and maybe learn a thing or two! 
 
+## todo:
 
-| Things to do                                     | Done? | 
-|--------------------------------------------------|-------|
-| respawning                                       | no    |
-| fix collisions                                   | no    |
-| jump buffering                                   | no    | 
-| Coyote time                                      | no    |
-| add more types of obstacles                      | no    |
-| Figure out a way to handle textures (and levels) | no    |
-| circular and diagonal hitboxes                   | no    |
-| animations                                       | no    |
-| Level-editor                                     | no    |
+### logic:
+1. [ ] respawning
+2. [ ] collisions fix (allow for different effects)
+3. [ ] jump buffering
+4. [ ] Coyote time
+5. [ ] add more types of obstacles
+
+### design:
+1. [ ] Figure out a way to handle textures 
+2. [ ] Figure out a way to handle levels
+3. [ ] Level-editor
+
+### interface:
+
+#### animations:
+1. [ ] left and right        
+2. [ ] grabbing             
+3. [ ] dash                 
+4. [ ] walk                    
+5. [ ] jump and fall    
+
+#### sound:
+1. [ ] background  
+2. [ ] walk   
+3. [ ] dash    
+4. [ ] walk        
+5. [ ] jump      

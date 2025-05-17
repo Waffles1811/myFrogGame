@@ -16,21 +16,8 @@ namespace world {
         world(std::shared_ptr<abstractFactory>);
         void setup();
         void time_up(float time);
+        void processInputs(movement);
 
-
-        // movement related functions:
-        void goLeft();
-        void goRight();
-        void stopLeft();
-        void stopRight();
-        void faceUp();
-        void faceDown();
-        void stopUp();
-        void stopDown();
-        void jump();
-        void dash();
-        void clingToWall();
-        void releaseWall();
     };
 }
 #endif //LITTLEGAME_WORLD_H

@@ -15,6 +15,7 @@ world::entity* repr::concreteFactory::produceEntity() {
 
 std::shared_ptr<world::player> repr::concreteFactory::producePlayer() {
     std::shared_ptr<world::player> player = std::make_shared<world::player>(world::player());
+    player->initialize();
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
     player->setpCam(cam);
     std::string name = "player";
