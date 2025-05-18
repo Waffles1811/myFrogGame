@@ -6,7 +6,7 @@ for me to have fun developing and maybe learn a thing or two!
 ### logic:
 1. [ ] respawning
 2. [x] collisions fix (allow for different effects)
-3. [ ] jump buffering
+3. [x] jump buffering
 4. [x] Coyote time
 5. [ ] add more types of obstacles
 

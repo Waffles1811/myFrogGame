@@ -12,13 +12,11 @@ enum player_consts{
     walkSlowdown = 1500,
     jumpSpeed = 450,
     gravity = 1000,
-    dashSpeed = 700
+    dashSpeed = 700,
 };
 
-
-
 world::player::player() : entity(0, 0) {
-    hitbox = std::make_shared<world::rectHitbox>(48.7, 60.1, false);
+    hitbox = std::make_shared<world::rectHitbox>(32.2, 49.3, 20.9, 0, false);
 }
 
 void world::player::initialize(){
@@ -130,6 +128,10 @@ void world::playerMovement::timeUp(float time) {
         coyoteTime -= time;
     }
 
+    if (jumpBufferTime > 0){
+        jumpBufferTime -= time;
+    }
+
     if (wallClinging and touchingWall){
         xSpeed = 0;
         if (facingUp){
@@ -214,17 +216,24 @@ void world::playerMovement::stopDown(){
 void world::playerMovement::jump(){
     if (grounded or coyoteTime>0){
         ySpeed += jumpSpeed;
+    } else {
+        jumpBufferTime = 0.1;
     }
-    grounded = false;
 }
 
 void world::playerMovement::land(float height) {
     if (ySpeed < 0) {
-        player_entity.lock()->setYCoord(height);
-        ySpeed = 0;
-        grounded = true;
-        canDash = true;
-        wallClingTime = 3;
+        if (jumpBufferTime > 0){
+            grounded = true;
+            jump();
+        }
+        else {
+            player_entity.lock()->setYCoord(height);
+            ySpeed = 0;
+            grounded = true;
+            canDash = true;
+            wallClingTime = 3;
+        }
     }
 }
 
@@ -302,7 +311,7 @@ world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : pl
 
 
 void world::collisionHandler::handleCollision(int id, const std::shared_ptr<entity>& hitObject) {
-    id = hitObject->handleCollision(id); // for object that allow you to go trough them or sum
+    id = hitObject->handleCollision(id); // for object that allow you to go through them or sum
     switch (id) {
         case 0:
             movement.lock()->fall();
@@ -315,10 +324,10 @@ void world::collisionHandler::handleCollision(int id, const std::shared_ptr<enti
             movement.lock()->boinkHead();
             break;
         case 3: // left (off player)
-            movement.lock()->hitWall(hitObject->getHitbox()->getRightX(), true);
+            movement.lock()->hitWall(hitObject->getHitbox()->getRightX() - 20.9, true);
             break;
         case 4: // right (off player)
-            movement.lock()->hitWall(hitObject->getHitbox()->getLeftX()
+            movement.lock()->hitWall(hitObject->getHitbox()->getLeftX() - 20.9
                                      - player_entity.lock()->getHitbox()->length, false);
             break;
         case 5:

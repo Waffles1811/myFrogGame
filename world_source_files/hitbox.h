@@ -5,8 +5,10 @@ namespace world {
     protected:
         float x;
         float y;
+        float xOffset;
+        float yOffset;
     public:
-        hitbox() = default;
+        hitbox(float _xOffset, float _yOffset);
         virtual void setX(float _x); // might be overridden if I add circular shapes or smth
         virtual void setY(float _y);
     };
@@ -18,7 +20,7 @@ namespace world {
         bool killsYou; // owie that hurts :(
 
 
-        rectHitbox(float, float, bool);
+        rectHitbox(float, float, float, float, bool);
         int detectCollision(rectHitbox& otherBox, float xDif, float yDif);
         /*codes:
          * 0 = no collision

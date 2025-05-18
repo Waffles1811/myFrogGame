@@ -71,6 +71,7 @@ namespace world {
         float wallClingTime;
 
         float coyoteTime;
+        float jumpBufferTime;
 
     public:
         playerMovement(std::weak_ptr<player>);
