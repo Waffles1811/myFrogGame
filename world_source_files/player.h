@@ -22,9 +22,11 @@ enum class movement{
 };
 
 namespace world {
+    // some declarations
     class playerMovement;
     class inputHandler;
     class collisionHandler;
+
     class player : public entity, public std::enable_shared_from_this<player>  {
     private:
         std::shared_ptr<playerMovement> movement;
@@ -36,7 +38,7 @@ namespace world {
         void timeUp(float time) override;
         void die(); // should make player respawn
         void processInput(enum movement input);
-        void handleCollision(int id, const std::shared_ptr<entity>& hitobject);
+        void handleCollision(int id, const std::shared_ptr<entity>& hitObject);
         };
 
     class inputHandler{
@@ -67,6 +69,8 @@ namespace world {
         bool touchingWall;
         bool wallClinging;
         float wallClingTime;
+
+        float coyoteTime;
 
     public:
         playerMovement(std::weak_ptr<player>);
@@ -100,7 +104,7 @@ namespace world {
         std::weak_ptr<player> player_entity;
     public:
         collisionHandler(std::weak_ptr<playerMovement>, std::weak_ptr<player>);
-        void handleCollision(int id, const std::shared_ptr<entity>& hitobject);
+        void handleCollision(int id, const std::shared_ptr<entity>& hitObject);
     };
 }
 

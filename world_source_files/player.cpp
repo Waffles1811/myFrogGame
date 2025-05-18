@@ -31,8 +31,6 @@ void world::player::initialize(){
 void world::player::timeUp(float time) {
     movement->timeUp(time);
 
-    x += time * movement->xSpeed;
-    y += time * movement->ySpeed;
 
     hitbox->setX(x);
     hitbox->setY(y);
@@ -52,8 +50,8 @@ void world::player::processInput(enum movement input) {
     inputHandling->processInput(input);
 }
 
-void world::player::handleCollision(int id, const std::shared_ptr<entity>& hitobject) {
-    collisionFixer->handleCollision(id, hitobject);
+void world::player::handleCollision(int id, const std::shared_ptr<entity>& hitObject) {
+    collisionFixer->handleCollision(id, hitObject);
 }
 
 void world::inputHandler::processInput(enum movement input) {
@@ -94,11 +92,7 @@ void world::inputHandler::processInput(enum movement input) {
         case movement::stopCling:
             movement.lock()->releaseWall();
             break;
-
-
-
     }
-
 }
 
 world::inputHandler::inputHandler(std::weak_ptr<playerMovement> _movement) : movement(_movement) {}
@@ -132,6 +126,10 @@ void world::playerMovement::timeUp(float time) {
         }
     }
 
+    if (coyoteTime>0){
+        coyoteTime -= time;
+    }
+
     if (wallClinging and touchingWall){
         xSpeed = 0;
         if (facingUp){
@@ -147,6 +145,8 @@ void world::playerMovement::timeUp(float time) {
             wallClinging = false;
         }
     }
+    player_entity.lock()->setXCoord( player_entity.lock()->getXCoord() + time * xSpeed);
+    player_entity.lock()->setYCoord( player_entity.lock()->getYCoord() + time * ySpeed);
 }
 
 void world::playerMovement::goLeft() {
@@ -212,7 +212,7 @@ void world::playerMovement::stopDown(){
 }
 
 void world::playerMovement::jump(){
-    if (grounded){
+    if (grounded or coyoteTime>0){
         ySpeed += jumpSpeed;
     }
     grounded = false;
@@ -230,7 +230,10 @@ void world::playerMovement::land(float height) {
 
 void world::playerMovement::fall() {
     if (player_entity.lock()->getYCoord()>-600) {
-        grounded = false;
+        if (grounded){
+            grounded = false;
+            coyoteTime = 0.1;
+        }
     }
 }
 
@@ -291,28 +294,32 @@ void world::playerMovement::endDash(){
     }
 }
 
-world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : player_entity(_player_entity) {}
+world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : player_entity(_player_entity) {
+    grounded = goingLeft = goingRight = facingUp = facingDown = canDash = inDash = wallClinging = touchingWall = false;
+    dashTime = wallClingTime = coyoteTime = 0.0;
+    dashDirection = 0.0;
+}
 
 
-void world::collisionHandler::handleCollision(int id, const std::shared_ptr<entity>& hitobject) {
-    id = hitobject->handleCollision(id); // for object that allow you to go trough them or sum
+void world::collisionHandler::handleCollision(int id, const std::shared_ptr<entity>& hitObject) {
+    id = hitObject->handleCollision(id); // for object that allow you to go trough them or sum
     switch (id) {
         case 0:
             movement.lock()->fall();
             movement.lock()->noWall();
             break;
         case 1: // from above
-            movement.lock()->land(hitobject->getHitbox()->getUpY() + player_entity.lock()->getHitbox()->height);
+            movement.lock()->land(hitObject->getHitbox()->getUpY() + player_entity.lock()->getHitbox()->height);
             break;
         case 2: // from below
             movement.lock()->boinkHead();
             break;
         case 3: // left (off player)
-            movement.lock()->hitWall(hitobject->getHitbox()->getRightX(), true);
+            movement.lock()->hitWall(hitObject->getHitbox()->getRightX(), true);
             break;
         case 4: // right (off player)
-            movement.lock()->hitWall(hitobject->getHitbox()->getLeftX()
-                                                - player_entity.lock()->getHitbox()->length, false);
+            movement.lock()->hitWall(hitObject->getHitbox()->getLeftX()
+                                     - player_entity.lock()->getHitbox()->length, false);
             break;
         case 5:
             player_entity.lock()->die();
