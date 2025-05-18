@@ -16,7 +16,7 @@ enum player_consts{
 };
 
 world::player::player() : entity(0, 0) {
-    hitbox = std::make_shared<world::rectHitbox>(32.2, 49.3, 20.9, 0, false);
+    hitbox = std::make_shared<world::rectHitbox>(51, 92, 0, 0, false);
 }
 
 void world::player::initialize(){
@@ -324,10 +324,10 @@ void world::collisionHandler::handleCollision(int id, const std::shared_ptr<enti
             movement.lock()->boinkHead();
             break;
         case 3: // left (off player)
-            movement.lock()->hitWall(hitObject->getHitbox()->getRightX() - 20.9, true);
+            movement.lock()->hitWall(hitObject->getHitbox()->getRightX(), true);
             break;
         case 4: // right (off player)
-            movement.lock()->hitWall(hitObject->getHitbox()->getLeftX() - 20.9
+            movement.lock()->hitWall(hitObject->getHitbox()->getLeftX()
                                      - player_entity.lock()->getHitbox()->length, false);
             break;
         case 5:

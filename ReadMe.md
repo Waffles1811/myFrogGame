@@ -1,6 +1,9 @@
 This project is just meant to be a small unoriginal platforming game
 for me to have fun developing and maybe learn a thing or two! 
 
+
+Characters (though drawn by me) and music are made and probably copyrighted by Gloryhammer
+
 ## todo:
 
 ### logic:

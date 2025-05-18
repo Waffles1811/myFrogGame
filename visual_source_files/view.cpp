@@ -17,4 +17,3 @@ void view::makeframe(float xDimension, float yDimension) {
 void view::addentity(std::shared_ptr<viewEntity> _entity) {
     entities.push_back(_entity);
 }
-
