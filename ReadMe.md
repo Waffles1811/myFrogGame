@@ -12,6 +12,7 @@ Characters (though drawn by me) and music are made and probably copyrighted by G
 3. [x] jump buffering
 4. [x] Coyote time
 5. [ ] add more types of obstacles
+6. [ ] try to create a round-ish effect on rectangular hitboxes
 
 ### design:
 1. [ ] Figure out a way to handle textures 

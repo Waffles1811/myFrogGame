@@ -215,7 +215,8 @@ void world::playerMovement::stopDown(){
 
 void world::playerMovement::jump(){
     if (grounded or coyoteTime>0){
-        ySpeed += jumpSpeed;
+        ySpeed = jumpSpeed;
+        grounded = false;
     } else {
         jumpBufferTime = 0.1;
     }
@@ -224,15 +225,18 @@ void world::playerMovement::jump(){
 void world::playerMovement::land(float height) {
     if (ySpeed < 0) {
         if (jumpBufferTime > 0){
+            std::cout<<"jump buffering used" << std::endl;
+            player_entity.lock()->setYCoord(height+1);
+            ySpeed = 0;
             grounded = true;
             jump();
         }
         else {
-            player_entity.lock()->setYCoord(height);
             ySpeed = 0;
             grounded = true;
             canDash = true;
             wallClingTime = 3;
+            player_entity.lock()->setYCoord(height);
         }
     }
 }
