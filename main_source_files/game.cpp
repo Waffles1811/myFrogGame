@@ -21,7 +21,7 @@ void game::main_game_loop() {
         timeSinceLastTic = stopwatchInc->getStopwatch()->timeTic();
         processInputs();
         world->time_up(timeSinceLastTic);
-        playerView->makeframe(0, 0);
+        playerView->makeframe(0, 0, timeSinceLastTic);
         // ^^ change these numbers at some point :) probably get them from camera looking at player position
     }
 }

@@ -2,7 +2,9 @@ This project is just meant to be a small unoriginal platforming game
 for me to have fun developing and maybe learn a thing or two! 
 
 
-Characters (though drawn by me) and music are made and probably copyrighted by Gloryhammer
+Current character drawn (shabbily) by me, will probably redo it in the future
+kinda based of this sprite pack: https://pop-shop-packs.itch.io/frogs-pixel-asset-pack
+which is made by pop shop(?): https://pop-shop-packs.itch.io/
 
 ## todo:
 
@@ -22,14 +24,14 @@ Characters (though drawn by me) and music are made and probably copyrighted by G
 3. [ ] Level-editor
 
 ### interface:
-1. [ ] DECIDE UPON A VISUAL THEME
+1. [x] DECIDE UPON A VISUAL THEME: FROG
 
 #### animations:
 1. [ ] left and right        
 2. [ ] grabbing             
 3. [ ] dash                 
 4. [ ] walk                    
-5. [ ] jump and fall    
+5. [x] jump and fall    
 
 #### sound:
 1. [ ] background  

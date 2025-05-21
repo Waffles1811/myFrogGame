@@ -18,7 +18,7 @@ enum player_physics{ // divide things by 100.0 if they have "time" in their name
 };
 
 world::player::player() : entity(0, 0) {
-    hitbox = std::make_shared<world::rectHitbox>(48.6, 88, 0, 0, false);
+    hitbox = std::make_shared<world::rectHitbox>(55, 35, 0, 0, false);
 }
 
 void world::player::initialize(){
@@ -26,6 +26,7 @@ void world::player::initialize(){
     movement = std::make_shared<playerMovement>(this_pointer);
     inputHandling = std::make_shared<inputHandler>(movement);
     collisionFixer = std::make_shared<collisionHandler>(movement, this_pointer, x, y);
+    animationHandling = std::make_shared<animationHandler>();
 }
 
 void world::player::timeUp(float time) {
@@ -51,6 +52,14 @@ void world::player::handleCollision(int id, const std::shared_ptr<entity>& hitOb
 
 void world::player::reset() {
     movement->reset();
+}
+
+void world::player::setAnimationCamera(std::shared_ptr<world::animationObserver> _observer) {
+    animationHandling->setAnimationCamera(_observer);
+}
+
+const std::shared_ptr<world::animationHandler> &world::player::getAnimationHandling() const {
+    return animationHandling;
 }
 
 void world::inputHandler::processInput(enum movement input) {
@@ -104,6 +113,7 @@ void world::playerMovement::timeUp(float time) {
         if (jumping) {
             ySpeed -= jumpingGravity * time;
         } else {
+            player_entity.lock()->getAnimationHandling()->processAnimation(animation::fall);
             ySpeed -= downwardsGravity * time;
         }
     }
@@ -236,6 +246,7 @@ void world::playerMovement::jump(){
         jumpingTime = (float) jumpTime/100.0;
         grounded = false;
         ySpeed = jumpSpeed;
+        player_entity.lock()->getAnimationHandling()->processAnimation(animation::jump);
     } else {
         jumpBufferTime = 0.1;
     }
@@ -260,6 +271,8 @@ void world::playerMovement::land(float height) {
             canDash = true;
             wallClingTime = 3;
             player_entity.lock()->setYCoord(height);
+            player_entity.lock()->getAnimationHandling()->processAnimation(animation::land);
+
         }
     }
 }
@@ -380,3 +393,13 @@ void world::collisionHandler::respawn() {
     player_entity.lock()->setYCoord(yRespawnPoint);
     player_entity.lock()->reset();
 }
+
+void world::animationHandler::processAnimation(animation animationID) {
+    observer->startAnimation(animationID);
+}
+
+void world::animationHandler::setAnimationCamera(std::shared_ptr<world::animationObserver> _observer) {
+    observer = _observer;
+}
+
+world::animationHandler::animationHandler() {}

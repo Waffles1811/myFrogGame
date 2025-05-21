@@ -27,12 +27,16 @@ namespace world {
     class playerMovement;
     class inputHandler;
     class collisionHandler;
-
+    class animationHandler;
     class player : public entity, public std::enable_shared_from_this<player>  {
     private:
         std::shared_ptr<playerMovement> movement;
         std::shared_ptr<inputHandler> inputHandling;
         std::shared_ptr<collisionHandler> collisionFixer;
+        std::shared_ptr<animationHandler> animationHandling;
+    public:
+        const std::shared_ptr<animationHandler> &getAnimationHandling() const;
+
     public:
         player();
         void initialize();
@@ -40,6 +44,7 @@ namespace world {
         void processInput(enum movement input);
         void handleCollision(int id, const std::shared_ptr<entity>& hitObject);
         void reset();
+        void setAnimationCamera(std::shared_ptr<world::animationObserver> _observer);
         };
 
     class inputHandler{
@@ -114,6 +119,15 @@ namespace world {
         collisionHandler(std::weak_ptr<playerMovement>, std::weak_ptr<player>,float, float);
         void handleCollision(int id, const std::shared_ptr<entity>& hitObject);
         void respawn();
+    };
+
+    class animationHandler{ // maybe change the hitbox in certain scenario's idk
+        std::shared_ptr<world::animationObserver> observer;
+    public:
+        animationHandler();
+        ~animationHandler() = default;
+        void processAnimation(animation animationID);
+        void setAnimationCamera(std::shared_ptr<world::animationObserver> _observer);
     };
 }
 

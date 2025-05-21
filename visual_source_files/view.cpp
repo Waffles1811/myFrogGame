@@ -6,9 +6,9 @@ view::view() : window(std::unique_ptr<sf::RenderWindow>(new sf::RenderWindow(sf:
 
 }
 
-void view::makeframe(float xDimension, float yDimension) {
+void view::makeframe(float xDimension, float yDimension, float time) {
     for(auto & entity : entities){
-        window->draw(entity->getSprite(xDimension, yDimension)); // draws sprites
+        window->draw(entity->getSprite(xDimension, yDimension, time)); // draws sprites
     }
     window->display(); // ends frame
     window->clear();   // clears window for next frame (internally, not on screen)

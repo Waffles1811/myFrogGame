@@ -21,6 +21,18 @@ namespace repr {
         ~concreteCamera() override = default;
         float getXcoord(float xHeight);
         float getYcoord(float Ylength);
+    };
+
+    class concreteAnimationObserver : public world::animationObserver {
+    private:
+        animation curAnimation;
+        bool changed;
+    public:
+        concreteAnimationObserver();
+        ~concreteAnimationObserver() = default;
+
+        void startAnimation(animation) override;
+        animation getAnimation();
 
     };
 }

@@ -12,7 +12,7 @@ namespace repr {
 
         view();
         void addentity(std::shared_ptr<viewEntity>);
-        void makeframe(float xDimension, float yDimension);
+        void makeframe(float xDimension, float yDimension, float time);
     };
 }
 
