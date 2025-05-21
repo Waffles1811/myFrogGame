@@ -48,8 +48,9 @@ void game::processInputs() {
                     world->processInputs(movement::dash);
                 } else if (event.key.code == sf::Keyboard::Q){
                     world->processInputs(movement::wallCling);
+                } else if (event.key.code == sf::Keyboard::Escape){
+                    playerView->window->close();
                 }
-
                 break;
             case sf::Event::KeyReleased:
                 // sets the variable to false again if the key isn't being pressed anymore
@@ -61,6 +62,8 @@ void game::processInputs() {
                     world->processInputs(movement::stopUp);
                 } else if (event.key.code == sf::Keyboard::Down or event.key.code == sf::Keyboard::S) {
                     world->processInputs(movement::stopDown);
+                } else if (event.key.code == sf::Keyboard::Space){
+                    world->processInputs(movement::stopJump);
                 } else if (event.key.code == sf::Keyboard::Q){
                     world->processInputs(movement::stopCling);
                 }

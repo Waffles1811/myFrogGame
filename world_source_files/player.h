@@ -12,6 +12,7 @@ enum class movement{
     moveLeft,
     faceUp,
     jump,
+    stopJump,
     dash,
     wallCling,
     stopRight,
@@ -36,9 +37,9 @@ namespace world {
         player();
         void initialize();
         void timeUp(float time) override;
-        void die(); // should make player respawn
         void processInput(enum movement input);
         void handleCollision(int id, const std::shared_ptr<entity>& hitObject);
+        void reset();
         };
 
     class inputHandler{
@@ -54,12 +55,14 @@ namespace world {
         float ySpeed;
     private:
         std::weak_ptr<player> player_entity;
-        bool grounded;
-
         bool goingLeft;
         bool goingRight;
         bool facingUp;
         bool facingDown;
+
+        bool grounded;
+        bool jumping;
+        float jumpingTime;
 
         bool canDash;
         bool inDash;
@@ -76,6 +79,7 @@ namespace world {
     public:
         playerMovement(std::weak_ptr<player>);
         void timeUp(float time);
+        void reset();
 
         void goLeft();
         void goRight();
@@ -93,6 +97,7 @@ namespace world {
         void stopDown();
 
         void jump();
+        void stopJump();
         void land(float height);
         void fall();
 
@@ -101,11 +106,14 @@ namespace world {
     };
 
     class collisionHandler{
+        float xRespawnPoint;
+        float yRespawnPoint;
         std::weak_ptr<playerMovement> movement;
         std::weak_ptr<player> player_entity;
     public:
-        collisionHandler(std::weak_ptr<playerMovement>, std::weak_ptr<player>);
+        collisionHandler(std::weak_ptr<playerMovement>, std::weak_ptr<player>,float, float);
         void handleCollision(int id, const std::shared_ptr<entity>& hitObject);
+        void respawn();
     };
 }
 

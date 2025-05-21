@@ -19,7 +19,7 @@ std::shared_ptr<world::player> repr::concreteFactory::producePlayer() {
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
     player->setpCam(cam);
     std::string name = "player";
-    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, cam, 2);
+    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, cam, 1.8);
     playerView->addentity(model);
     return player;
 }

@@ -1,7 +1,7 @@
 #include "view.h"
 using namespace repr;
-view::view() : window(std::unique_ptr<sf::RenderWindow>(new sf::RenderWindow(sf::VideoMode(1200, 900),
-                                                                             "celeste"))){
+view::view() : window(std::unique_ptr<sf::RenderWindow>(new sf::RenderWindow(sf::VideoMode(1920, 1080),
+                                                                             "quest for Fife", sf::Style::Fullscreen))){
     window->setVerticalSyncEnabled(true);
 
 }

@@ -12,7 +12,9 @@ Characters (though drawn by me) and music are made and probably copyrighted by G
 3. [x] jump buffering
 4. [x] Coyote time
 5. [ ] add more types of obstacles
-6. [ ] try to create a round-ish effect on rectangular hitboxes
+6. [ ] edge-nudging
+7. [ ] improve jumping with variable jump height and faster falling
+8. [ ] apex modifier
 
 ### design:
 1. [ ] Figure out a way to handle textures 
@@ -20,6 +22,7 @@ Characters (though drawn by me) and music are made and probably copyrighted by G
 3. [ ] Level-editor
 
 ### interface:
+1. [ ] DECIDE UPON A VISUAL THEME
 
 #### animations:
 1. [ ] left and right        

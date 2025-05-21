@@ -6,29 +6,30 @@
 #include <cmath>
 #include <iostream>
 #include <utility>
-enum player_consts{
+enum player_physics{ // divide things by 100.0 if they have "time" in their name
     walkSpeed = 400,
-    walkAcceleration = 700,
+    walkAcceleration = 900,
     walkSlowdown = 1500,
-    jumpSpeed = 450,
-    gravity = 1000,
+    jumpSpeed = 500,
+    jumpTime = 25,
+    jumpingGravity = 600,
+    downwardsGravity = 1500,
     dashSpeed = 700,
 };
 
 world::player::player() : entity(0, 0) {
-    hitbox = std::make_shared<world::rectHitbox>(51, 92, 0, 0, false);
+    hitbox = std::make_shared<world::rectHitbox>(48.6, 88, 0, 0, false);
 }
 
 void world::player::initialize(){
     std::weak_ptr<player> this_pointer = shared_from_this();
     movement = std::make_shared<playerMovement>(this_pointer);
     inputHandling = std::make_shared<inputHandler>(movement);
-    collisionFixer = std::make_shared<collisionHandler>(movement, this_pointer);
+    collisionFixer = std::make_shared<collisionHandler>(movement, this_pointer, x, y);
 }
 
 void world::player::timeUp(float time) {
     movement->timeUp(time);
-
 
     hitbox->setX(x);
     hitbox->setY(y);
@@ -40,16 +41,16 @@ void world::player::timeUp(float time) {
     positionCamera->updateCoords(x, y);
 }
 
-void world::player::die() {
-     // add respawning later
-}
-
 void world::player::processInput(enum movement input) {
     inputHandling->processInput(input);
 }
 
 void world::player::handleCollision(int id, const std::shared_ptr<entity>& hitObject) {
     collisionFixer->handleCollision(id, hitObject);
+}
+
+void world::player::reset() {
+    movement->reset();
 }
 
 void world::inputHandler::processInput(enum movement input) {
@@ -68,6 +69,9 @@ void world::inputHandler::processInput(enum movement input) {
             break;
         case movement::jump:
             movement.lock()->jump();
+            break;
+        case movement::stopJump:
+            movement.lock()->stopJump();
             break;
         case movement::dash:
             movement.lock()->dash();
@@ -97,7 +101,11 @@ world::inputHandler::inputHandler(std::weak_ptr<playerMovement> _movement) : mov
 
 void world::playerMovement::timeUp(float time) {
     if (not grounded){
-        ySpeed -= gravity * time;
+        if (jumping) {
+            ySpeed -= jumpingGravity * time;
+        } else {
+            ySpeed -= downwardsGravity * time;
+        }
     }
     if (goingLeft and xSpeed > -walkSpeed){
         xSpeed -= walkAcceleration * time;
@@ -105,15 +113,24 @@ void world::playerMovement::timeUp(float time) {
     else if (goingRight and xSpeed < walkSpeed){
         xSpeed += walkAcceleration * time;
     }
-    if (not goingLeft and xSpeed < -0.01){
+    if (not goingLeft and xSpeed < -5){
         xSpeed += walkSlowdown * time;
     }
-    else if (not goingRight and xSpeed > 0.01){
+    else if (not goingRight and xSpeed > 5){
         xSpeed -= walkSlowdown * time;
     }
-    if (xSpeed < 0.1 and xSpeed > -0.1){
+    else if (xSpeed < 5 and xSpeed > -5){
         xSpeed = 0;
     }
+
+    if (jumping){
+        //ySpeed = jumpSpeed;
+        jumpingTime -= time;
+        if (jumpingTime < 0){
+            jumping = false;
+        }
+    }
+
     if (inDash){
         xSpeed = dashSpeed * cos(-dashDirection/4.0*3.14159);
         ySpeed = dashSpeed * sin(-dashDirection/4.0*3.14159);
@@ -215,17 +232,23 @@ void world::playerMovement::stopDown(){
 
 void world::playerMovement::jump(){
     if (grounded or coyoteTime>0){
-        ySpeed = jumpSpeed;
+        jumping = true;
+        jumpingTime = (float) jumpTime/100.0;
         grounded = false;
+        ySpeed = jumpSpeed;
     } else {
         jumpBufferTime = 0.1;
     }
 }
 
+
+void world::playerMovement::stopJump() {
+    jumping = false;
+}
+
 void world::playerMovement::land(float height) {
     if (ySpeed < 0) {
         if (jumpBufferTime > 0){
-            std::cout<<"jump buffering used" << std::endl;
             player_entity.lock()->setYCoord(height+1);
             ySpeed = 0;
             grounded = true;
@@ -254,6 +277,7 @@ void world::playerMovement::dash(){
     if (not canDash){
         return;
     }
+    jumping = false;
     canDash = false;
     grounded = false;
     inDash = true;
@@ -308,6 +332,12 @@ void world::playerMovement::endDash(){
 }
 
 world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : player_entity(_player_entity) {
+    grounded = goingLeft = goingRight = facingUp = facingDown = canDash = inDash = wallClinging = jumping = touchingWall = false;
+    dashTime = wallClingTime = coyoteTime = jumpingTime = 0.0;
+    dashDirection = 0.0;
+}
+
+void world::playerMovement::reset() {
     grounded = goingLeft = goingRight = facingUp = facingDown = canDash = inDash = wallClinging = touchingWall = false;
     dashTime = wallClingTime = coyoteTime = 0.0;
     dashDirection = 0.0;
@@ -335,11 +365,18 @@ void world::collisionHandler::handleCollision(int id, const std::shared_ptr<enti
                                      - player_entity.lock()->getHitbox()->length, false);
             break;
         case 5:
-            player_entity.lock()->die();
+            respawn();
         default:
             break;
     }
 }
 
-world::collisionHandler::collisionHandler(std::weak_ptr<playerMovement> _movement, std::weak_ptr<player> _player_entity)
-    : movement(std::move(_movement)), player_entity(std::move(_player_entity)){}
+world::collisionHandler::collisionHandler(std::weak_ptr<playerMovement> _movement, std::weak_ptr<player> _player_entity
+        , float _xRespawnPoint, float _yRespawnPoint) : movement(std::move(_movement)),
+            player_entity(std::move(_player_entity)), xRespawnPoint(_xRespawnPoint), yRespawnPoint(_yRespawnPoint){}
+
+void world::collisionHandler::respawn() {
+    player_entity.lock()->setXCoord(xRespawnPoint);
+    player_entity.lock()->setYCoord(yRespawnPoint);
+    player_entity.lock()->reset();
+}
