@@ -13,7 +13,7 @@ Characters (though drawn by me) and music are made and probably copyrighted by G
 4. [x] Coyote time
 5. [ ] add more types of obstacles
 6. [ ] edge-nudging
-7. [ ] improve jumping with variable jump height and faster falling
+7. [x] improve jumping with variable jump height and faster falling
 8. [ ] apex modifier
 
 ### design:
