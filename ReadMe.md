@@ -2,9 +2,9 @@ This project is just meant to be a small unoriginal platforming game
 for me to have fun developing and maybe learn a thing or two! 
 
 
-Current character drawn (shabbily) by me, will probably redo it in the future
-kinda based of this sprite pack: https://pop-shop-packs.itch.io/frogs-pixel-asset-pack
-which is made by pop shop(?): https://pop-shop-packs.itch.io/
+Current character drawn (shabbily) by me, will probably redo it in the future.\
+I kinda based it of this sprite pack: https://pop-shop-packs.itch.io/frogs-pixel-asset-pack \
+which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 
 ## todo:
 
