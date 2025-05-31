@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
-
+#include <iostream>
 
 repr::viewEntity::viewEntity(std::string& _type, std::shared_ptr<concreteCamera> _camera, float _scale)
                                 : type(_type), camera(std::move(_camera)), scale(_scale) {
@@ -33,6 +33,7 @@ void repr::viewEntity::defaultTexture(){
     spriteRect.top = spriteRect.left = xOffset = yOffset = 0;
     spriteRect.width = texture->getSize().x;
     spriteRect.height = texture->getSize().y;
+    sprite->setTextureRect(spriteRect);
 }
 
 sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float time) {
@@ -41,7 +42,7 @@ sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float
     if (animationHandling) {
         animationHandling->updateAnimation(time);
     }
-    sprite->setPosition(x - xOffset * scale, y - yOffset * scale);
+    sprite->setPosition(x + xOffset * scale, y + yOffset * scale);
     return *sprite;
 }
 
@@ -58,8 +59,13 @@ void repr::viewEntity::setTexture(std::string &_texture, float newLength, float 
     }
     spriteRect.width = newLength;
     spriteRect.height = newHeight;
+    sprite->setTextureRect(spriteRect);
 }
 
+void repr::viewEntity::setOffsets(int _xOffset, int _yOffset) {
+    xOffset = _xOffset;
+    yOffset = _yOffset;
+}
 
 
 repr::animationHandler::animationHandler(std::string & type, std::shared_ptr<concreteAnimationObserver> _obs,
@@ -69,7 +75,7 @@ repr::animationHandler::animationHandler(std::string & type, std::shared_ptr<con
     inAnimation = false;
     timeSinceLastFrame = 0.0;
     xOffset = curX = curY = curFrame = 0;
-    xOffsets = yOffsets = {};
+    visualXOffset = visualYOffsets = {};
     std::ifstream file("assets/" + type + "/" + type +"_animations.JSON");
     animation_data = json::parse(file);
 }
@@ -106,11 +112,9 @@ void repr::animationHandler::startAnimation(animation type){
     auto data = animation_data[animationName];
     std::string filename = data["file"];
     frameDurations.erase(frameDurations.begin(), frameDurations.end());
-    xOffsets.erase(xOffsets.begin(), xOffsets.end());
-    yOffsets.erase(yOffsets.begin(), yOffsets.end());
     frameDurations = data["frameDurations"].get<std::vector<float>>();
-    xOffsets = data["displayXOffset"].get<std::vector<int>>();
-    yOffsets = data["displayYOffset"].get<std::vector<int>>();
+    visualXOffset = data["displayXOffset"];
+    visualYOffsets = data["displayYOffset"];
     curX = data["startXOffset"];
     curY = data["startYOffset"];
     xOffset = data["xOffset"];
@@ -118,17 +122,18 @@ void repr::animationHandler::startAnimation(animation type){
     inAnimation = true;
     sprite.lock()->setTexture(filename, xOffset, 16);
     sprite.lock()->setTextureBox(curX, curY);
+    sprite.lock()->setOffsets(visualXOffset, visualYOffsets);
 }
 
 void repr::animationHandler::continueAnimation(float time){
     if (not inAnimation){
         return;
     }
-    //time *= 1000;
+    time *= 1000;
+    if (curFrame > frameDurations.size()-1){
+        stopAnimation();
+    }
     if (timeSinceLastFrame > frameDurations[curFrame]){
-        if (curFrame == frameDurations.size()-1){
-            stopAnimation();
-        }
         timeSinceLastFrame = 0.0;
         curFrame++;
         curX += xOffset;

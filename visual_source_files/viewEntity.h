@@ -23,6 +23,7 @@ namespace repr {
         void initialize(std::shared_ptr<concreteAnimationObserver> _obs);
         void setTextureBox(int newX, int newY);
         void setTexture(std::string& _texture, float newLength, float newHeight);
+        void setOffsets(int xOffset, int yOffset);
         void defaultTexture();
         };
 
@@ -32,8 +33,8 @@ namespace repr {
         std::shared_ptr<concreteAnimationObserver> animationObserver;
         std::weak_ptr<viewEntity> sprite;
         std::vector<float> frameDurations; // in milliseconds
-        std::vector<int> xOffsets;
-        std::vector<int> yOffsets;
+        int visualXOffset;
+        int visualYOffsets;
         float timeSinceLastFrame;
         int curFrame;
         int curX; // where in the sprite sheet we are now

@@ -1,9 +1,9 @@
 {
   "jump": {
       "file": "player_jump.png",
-      "frameDurations": [30, 86, 86, 1000000],
-      "displayXOffset": [-5, -5, -1, 0],
-      "displayYOffset": [0, 0, 0, 0],
+      "frameDurations": [30, 150, 150, 1000000],
+      "displayXOffset": -8,
+      "displayYOffset": 0,
       "startXOffset": 0,
       "startYOffset" : 0,
       "xOffset" : 30,
@@ -13,9 +13,9 @@
   "land": {
     "file": "player_jump.png",
     "frameDurations": [86, 86],
-    "displayXOffset": [-1, -5],
-    "displayYOffset": [0, 0],
-    "startXOffset": 0,
+    "displayXOffset": -8,
+    "displayYOffset": 0,
+    "startXOffset": 120,
     "startYOffset" : 0,
     "xOffset" : 30,
     "yOffset" : 0
@@ -24,8 +24,8 @@
   "fall": {
     "file": "player_jump.png",
     "frameDurations": [1000000],
-    "displayXOffset": [0],
-    "displayYOffset": [0],
+    "displayXOffset": -8,
+    "displayYOffset": 0,
     "startXOffset": 90,
     "startYOffset" : 0,
     "xOffset" : 30,

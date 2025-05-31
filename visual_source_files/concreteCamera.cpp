@@ -21,6 +21,7 @@ float repr::concreteCamera::getYcoord(float YHeight) {
 
 animation repr::concreteAnimationObserver::getAnimation() {
     if (changed){
+        changed = false;
         return curAnimation;
     }
     else {

@@ -113,7 +113,9 @@ void world::playerMovement::timeUp(float time) {
         if (jumping) {
             ySpeed -= jumpingGravity * time;
         } else {
-            player_entity.lock()->getAnimationHandling()->processAnimation(animation::fall);
+            if (ySpeed < 0) {
+                player_entity.lock()->getAnimationHandling()->processAnimation(animation::fall);
+            }
             ySpeed -= downwardsGravity * time;
         }
     }

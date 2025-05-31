@@ -17,6 +17,7 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/
 6. [ ] edge-nudging
 7. [x] improve jumping with variable jump height and faster falling
 8. [ ] apex modifier
+9. [ ] air resistance
 
 ### design:
 1. [ ] Figure out a way to handle textures 
