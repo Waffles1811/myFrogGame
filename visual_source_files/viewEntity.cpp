@@ -33,8 +33,8 @@ void repr::viewEntity::defaultTexture(){
     spriteRect.top = spriteRect.left = xOffset = yOffset = 0;
     spriteRect.width = texture->getSize().x;
     spriteRect.height = texture->getSize().y;
-    sprite->setTextureRect(spriteRect);
-}
+     sprite->setTextureRect(spriteRect);
+ }
 
 sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float time) {
     float x = camera->getXcoord(xDimension);
