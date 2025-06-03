@@ -21,10 +21,11 @@ std::shared_ptr<world::player> repr::concreteFactory::producePlayer() {
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
     player->setpCam(cam);
     std::shared_ptr<repr::concreteAnimationObserver> obs = std::make_shared<repr::concreteAnimationObserver>();
-    player->setAnimationCamera(obs);
+    std::shared_ptr<repr::concreteOrientationObserver> orobs = std::make_shared<repr::concreteOrientationObserver>();
+    player->setAnimationCameras(obs, orobs);
     std::string name = "player";
     std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, cam, 2.5);
-    model->initialize(obs);
+    model->initialize(obs, orobs);
     playerView->addentity(model);
     return player;
 }
@@ -35,7 +36,7 @@ std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceObject(st
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
     object->setpCam(cam);
     std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(type, cam, 1);
-    model->initialize(nullptr);
+    model->initialize(nullptr, nullptr);
     playerView->addentity(model);
     return object;
 }

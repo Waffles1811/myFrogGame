@@ -54,13 +54,16 @@ void world::player::reset() {
     movement->reset();
 }
 
-void world::player::setAnimationCamera(std::shared_ptr<world::animationObserver> _observer) {
-    animationHandling->setAnimationCamera(_observer);
+void world::player::setAnimationCameras(std::shared_ptr<world::animationObserver> _animobserver,
+                                       std::shared_ptr<world::orientationObserver> _orientobserver) {
+    animationHandling->setAnimationCameras(_animobserver, _orientobserver);
 }
 
 const std::shared_ptr<world::animationHandler> &world::player::getAnimationHandling() const {
     return animationHandling;
 }
+
+
 
 void world::inputHandler::processInput(enum movement input) {
     switch (input){
@@ -187,12 +190,13 @@ void world::playerMovement::timeUp(float time) {
 void world::playerMovement::goLeft() {
     goingLeft = true;
     goingRight = false;
-
+    player_entity.lock()->getAnimationHandling()->turn(true);
 }
 
 void world::playerMovement::goRight(){
     goingLeft = false;
     goingRight = true;
+    player_entity.lock()->getAnimationHandling()->turn(false);
 
 }
 
@@ -407,8 +411,14 @@ void world::animationHandler::processAnimation(animation animationID) {
     observer->startAnimation(animationID);
 }
 
-void world::animationHandler::setAnimationCamera(std::shared_ptr<world::animationObserver> _observer) {
+void world::animationHandler::setAnimationCameras(std::shared_ptr<world::animationObserver> _observer,
+                                                  std::shared_ptr<world::orientationObserver> _obs) {
     observer = _observer;
+    orientationObserver = _obs;
 }
 
 world::animationHandler::animationHandler() {}
+
+void world::animationHandler::turn(bool direction) {
+    orientationObserver->turn(direction);
+}

@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
-#include <iostream>
 
 repr::viewEntity::viewEntity(std::string& _type, std::shared_ptr<concreteCamera> _camera, float _scale)
                                 : type(_type), camera(std::move(_camera)), scale(_scale) {
@@ -16,12 +15,14 @@ repr::viewEntity::viewEntity(std::string& _type, std::shared_ptr<concreteCamera>
     sprite = std::unique_ptr<sf::Sprite>(new sf::Sprite(*texture, spriteRect));
     sprite->setScale(scale, scale);
     xOffset = yOffset = 0;
+    curDirection = false;
 }
 
-void repr::viewEntity::initialize(std::shared_ptr<concreteAnimationObserver> _obs) {
+void repr::viewEntity::initialize(std::shared_ptr<concreteAnimationObserver> _obs,
+                                  std::shared_ptr<concreteOrientationObserver> orobs) {
     animationHandling = std::unique_ptr<repr::animationHandler>(
             new animationHandler(type, std::move(_obs), shared_from_this()));
-
+    orientationObserver = orobs;
 }
 
 void repr::viewEntity::defaultTexture(){
@@ -41,6 +42,16 @@ sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float
     float y = camera->getYcoord(yDimension);
     if (animationHandling) {
         animationHandling->updateAnimation(time);
+    }
+    if (orientationObserver) {
+        if (orientationObserver->getDirection() != curDirection) {
+            curDirection = orientationObserver->getDirection();
+            if (curDirection){
+                sprite->scale(-1, 1);
+            } else {
+                sprite->scale(-1, 1);
+            }
+        }
     }
     sprite->setPosition(x + xOffset * scale, y + yOffset * scale);
     return *sprite;
@@ -91,7 +102,7 @@ void repr::animationHandler::updateAnimation(float time) {
                 repeatingAnimation = false;
                 if (curFrame > 1) {
                     continueAnimation(time);
-                } else{
+                } else {
                     stopAnimation();
                 }
             }

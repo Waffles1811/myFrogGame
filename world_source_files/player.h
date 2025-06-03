@@ -35,16 +35,16 @@ namespace world {
         std::shared_ptr<collisionHandler> collisionFixer;
         std::shared_ptr<animationHandler> animationHandling;
     public:
-        const std::shared_ptr<animationHandler> &getAnimationHandling() const;
-
-    public:
         player();
         void initialize();
         void timeUp(float time) override;
         void processInput(enum movement input);
         void handleCollision(int id, const std::shared_ptr<entity>& hitObject);
         void reset();
-        void setAnimationCamera(std::shared_ptr<world::animationObserver> _observer);
+        void setAnimationCameras(std::shared_ptr<world::animationObserver> _animobserver,
+                                 std::shared_ptr<world::orientationObserver> _orientobserver);
+        const std::shared_ptr<animationHandler> &getAnimationHandling() const;
+
         };
 
     class inputHandler{
@@ -121,13 +121,16 @@ namespace world {
         void respawn();
     };
 
-    class animationHandler{ // maybe change the hitbox in certain scenario's idk
+    class animationHandler{ // maybe change the hitbox in certain scenarios idk
         std::shared_ptr<world::animationObserver> observer;
+        std::shared_ptr<world::orientationObserver> orientationObserver;
     public:
         animationHandler();
         ~animationHandler() = default;
         void processAnimation(animation animationID);
-        void setAnimationCamera(std::shared_ptr<world::animationObserver> _observer);
+        void setAnimationCameras(std::shared_ptr<world::animationObserver> _animobserver,
+                                std::shared_ptr<world::orientationObserver> _orientobserver);
+        void turn(bool direction);
     };
 }
 

@@ -36,3 +36,15 @@ repr::concreteAnimationObserver::concreteAnimationObserver() {
 void repr::concreteAnimationObserver::stopAnimation() {
     curAnimation = animation::none;
 }
+
+void repr::concreteOrientationObserver::turn(bool direction) {
+    facingLeft = direction;
+}
+
+repr::concreteOrientationObserver::concreteOrientationObserver() {
+    facingLeft = false;
+}
+
+bool repr::concreteOrientationObserver::getDirection() {
+    return facingLeft;
+}

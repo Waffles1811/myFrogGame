@@ -35,6 +35,15 @@ namespace repr {
         animation getAnimation();
 
     };
+
+    class concreteOrientationObserver : public  world::orientationObserver {
+    private:
+        bool facingLeft;
+    public:
+        concreteOrientationObserver();
+        void turn(bool direction) override;
+        bool getDirection();
+    };
 }
 
 #endif //LITTLEGAME_CONCRETECAMERA_H

@@ -31,7 +31,7 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 1. [ ] left and right        
 2. [ ] grabbing             
 3. [ ] dash                 
-4. [ ] walk                    
+4. [x] walk                    
 5. [x] jump and fall    
 
 #### sound:

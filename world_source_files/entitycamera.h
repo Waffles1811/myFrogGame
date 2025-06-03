@@ -29,6 +29,13 @@ namespace world {
 
         virtual void startAnimation(animation) = 0;
     };
+
+    class orientationObserver {
+        /* left = true, right = false */
+    public:
+        orientationObserver() = default;
+        virtual void turn(bool direction) = 0;
+    };
 }
 
 #endif //LITTLEGAME_ENTITYCAMERA_H

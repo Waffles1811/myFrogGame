@@ -12,15 +12,18 @@ namespace repr {
         std::shared_ptr<sf::Sprite> sprite;
         std::shared_ptr<concreteCamera> camera;
         std::unique_ptr<repr::animationHandler> animationHandling;
+        std::shared_ptr<repr::concreteOrientationObserver> orientationObserver;
         sf::IntRect spriteRect;
         std::string type;
         float scale;
         int xOffset; // sometime animations need us to add an offset since the left top corner might change
         int yOffset;
+        bool curDirection;
     public:
         viewEntity(std::string& _type, std::shared_ptr<concreteCamera> _camera, float _scale);
         sf::Sprite getSprite(float xDimension, float yDimension, float time);
-        void initialize(std::shared_ptr<concreteAnimationObserver> _obs);
+        void initialize(std::shared_ptr<concreteAnimationObserver> _obs,
+                        std::shared_ptr<concreteOrientationObserver> orobs);
         void setTextureBox(int newX, int newY);
         void setTexture(std::string& _texture, float newLength, float newHeight);
         void setOffsets(int xOffset, int yOffset);
@@ -45,7 +48,8 @@ namespace repr {
         bool repeatingAnimation;
 
     public:
-        animationHandler(std::string& _type, std::shared_ptr<concreteAnimationObserver>, const std::shared_ptr<viewEntity>&);
+        animationHandler(std::string& _type, std::shared_ptr<concreteAnimationObserver>,
+                const std::shared_ptr<viewEntity>&);
         void updateAnimation(float time);
         void startAnimation(animation type);
         void continueAnimation(float time);
