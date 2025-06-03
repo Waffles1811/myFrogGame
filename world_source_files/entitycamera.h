@@ -9,6 +9,7 @@ enum class animation{
     jump,
     land,
     fall,
+    walk,
     none
 };
 

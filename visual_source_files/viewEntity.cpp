@@ -72,12 +72,13 @@ repr::animationHandler::animationHandler(std::string & type, std::shared_ptr<con
                                          const std::shared_ptr<viewEntity>& _sprite)
     : animationObserver(std::move(_obs)) {
     sprite = _sprite;
-    inAnimation = false;
+    inAnimation = repeatingAnimation = false;
     timeSinceLastFrame = 0.0;
     xOffset = curX = curY = curFrame = 0;
     visualXOffset = visualYOffsets = {};
     std::ifstream file("assets/" + type + "/" + type +"_animations.JSON");
     animation_data = json::parse(file);
+    curAnimation = animation::none;
 }
 
 
@@ -85,7 +86,16 @@ repr::animationHandler::animationHandler(std::string & type, std::shared_ptr<con
 void repr::animationHandler::updateAnimation(float time) {
     if (animationObserver) {
         animation newAnimation = animationObserver->getAnimation();
-        if (newAnimation == animation::none) {
+        if (newAnimation == animation::none){
+            if (inAnimation){
+                repeatingAnimation = false;
+                if (curFrame > 1) {
+                    continueAnimation(time);
+                } else{
+                    stopAnimation();
+                }
+            }
+        } else if (newAnimation == curAnimation) {
             continueAnimation(time);
         } else {
             startAnimation(newAnimation);
@@ -105,6 +115,9 @@ void repr::animationHandler::startAnimation(animation type){
         case animation::fall:
             animationName = "fall";
             break;
+        case animation::walk:
+            animationName = "walk";
+            break;
         case animation::none:
             animationName = "this isn't supposed to be reachable";
             break;
@@ -118,11 +131,13 @@ void repr::animationHandler::startAnimation(animation type){
     curX = data["startXOffset"];
     curY = data["startYOffset"];
     xOffset = data["xOffset"];
+    repeatingAnimation = data ["repeating"];
     curFrame = 0;
     inAnimation = true;
-    sprite.lock()->setTexture(filename, xOffset, 16);
+    sprite.lock()->setTexture(filename, xOffset, data["ySize"]);
     sprite.lock()->setTextureBox(curX, curY);
     sprite.lock()->setOffsets(visualXOffset, visualYOffsets);
+    curAnimation = type;
 }
 
 void repr::animationHandler::continueAnimation(float time){
@@ -131,9 +146,12 @@ void repr::animationHandler::continueAnimation(float time){
     }
     time *= 1000;
     if (curFrame > frameDurations.size()-1){
-        stopAnimation();
-    }
-    if (timeSinceLastFrame > frameDurations[curFrame]){
+        if (repeatingAnimation){
+            startAnimation(curAnimation);
+        } else {
+            stopAnimation();
+        }
+    } else if (timeSinceLastFrame > frameDurations[curFrame]){
         timeSinceLastFrame = 0.0;
         curFrame++;
         curX += xOffset;
@@ -145,6 +163,8 @@ void repr::animationHandler::continueAnimation(float time){
 
 void repr::animationHandler::stopAnimation() {
     sprite.lock()->defaultTexture();
+    curAnimation = animation::none;
+    animationObserver->stopAnimation();
     inAnimation = false;
 }
 

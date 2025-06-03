@@ -20,23 +20,19 @@ float repr::concreteCamera::getYcoord(float YHeight) {
 
 
 animation repr::concreteAnimationObserver::getAnimation() {
-    if (changed){
-        changed = false;
-        return curAnimation;
-    }
-    else {
-        return animation::none;
-    }
+    return curAnimation;
 }
 
 void repr::concreteAnimationObserver::startAnimation(animation newAnimation) {
     if (curAnimation != newAnimation){
         curAnimation = newAnimation;
-        changed = true;
     }
 }
 
 repr::concreteAnimationObserver::concreteAnimationObserver() {
     curAnimation = animation::none;
-    changed = false;
+}
+
+void repr::concreteAnimationObserver::stopAnimation() {
+    curAnimation = animation::none;
 }

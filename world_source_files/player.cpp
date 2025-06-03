@@ -118,6 +118,10 @@ void world::playerMovement::timeUp(float time) {
             }
             ySpeed -= downwardsGravity * time;
         }
+    } else {
+        if (goingRight){
+            player_entity.lock()->getAnimationHandling()->processAnimation(animation::walk);
+        }
     }
     if (goingLeft and xSpeed > -walkSpeed){
         xSpeed -= walkAcceleration * time;
@@ -198,6 +202,9 @@ void world::playerMovement::stopLeft(){
 
 void world::playerMovement::stopRight(){
     goingRight = false;
+    if (grounded) {
+        player_entity.lock()->getAnimationHandling()->processAnimation(animation::none);
+    }
 }
 
 void world::playerMovement::boinkHead() {

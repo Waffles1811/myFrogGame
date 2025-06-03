@@ -33,6 +33,7 @@ namespace repr {
         std::shared_ptr<concreteAnimationObserver> animationObserver;
         std::weak_ptr<viewEntity> sprite;
         std::vector<float> frameDurations; // in milliseconds
+        animation curAnimation;
         int visualXOffset;
         int visualYOffsets;
         float timeSinceLastFrame;
@@ -41,6 +42,7 @@ namespace repr {
         int curY;
         int xOffset; // how many pixels we have to move for next sprite
         bool inAnimation;
+        bool repeatingAnimation;
 
     public:
         animationHandler(std::string& _type, std::shared_ptr<concreteAnimationObserver>, const std::shared_ptr<viewEntity>&);

@@ -26,12 +26,12 @@ namespace repr {
     class concreteAnimationObserver : public world::animationObserver {
     private:
         animation curAnimation;
-        bool changed;
     public:
         concreteAnimationObserver();
         ~concreteAnimationObserver() = default;
 
         void startAnimation(animation) override;
+        void stopAnimation();
         animation getAnimation();
 
     };
