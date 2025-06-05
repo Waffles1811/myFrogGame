@@ -40,7 +40,6 @@ namespace world {
         void setpCam(std::shared_ptr<entitycamera> newCam);
         virtual void timeUp(float time) = 0;
         virtual int handleCollision(int id);
-        void toSaveFileObject(std::vector<saveFileObject>&);
     };
 }
 

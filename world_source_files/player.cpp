@@ -19,12 +19,12 @@ enum player_physics{ // divide things by 100.0 if they have "time" in their name
 
 world::player::player() : entity(0, 0) {
     hitbox = std::make_shared<world::rectHitbox>(55, 35, 0, 0, false);
-    type : objectID::player;
+    type = objectID::player;
 }
 
 world::player::player(float x, float y) : entity(x, y) {
     hitbox = std::make_shared<world::rectHitbox>(55, 35, 0, 0, false);
-    type : objectID::player;
+    type = objectID::player;
 }
 
 void world::player::initialize(){
@@ -40,10 +40,6 @@ void world::player::timeUp(float time) {
 
     hitbox->setX(x);
     hitbox->setY(y);
-
-    if (y < -600){ // hard coded to float at bottom of screen for now
-        movement->land(-600);
-    }
 
     positionCamera->updateCoords(x, y);
 }
@@ -298,12 +294,11 @@ void world::playerMovement::land(float height) {
 }
 
 void world::playerMovement::fall() {
-    if (player_entity.lock()->getYCoord()>-600) {
-        if (grounded){
-            grounded = false;
-            coyoteTime = 0.1;
-        }
+    if (grounded){
+        grounded = false;
+        coyoteTime = 0.1;
     }
+
 }
 
 void world::playerMovement::dash(){

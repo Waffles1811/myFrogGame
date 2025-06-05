@@ -48,7 +48,7 @@ sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float
     if (orientationObserver) {
         if (orientationObserver->getDirection() != curDirection) {
             curDirection = orientationObserver->getDirection();
-            sprite->setScale(-1*scale, scale);
+            sprite->scale(-1, 1);
         }
     }
     if (curDirection) {
