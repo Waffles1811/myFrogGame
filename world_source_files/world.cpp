@@ -21,13 +21,36 @@ void world::world::time_up(float time) {
     }
 }
 
-void world::world::setup() {
-    playerchar = factory->producePlayer();
-    std::string type = "kevin";
-    entities.push_back(factory->produceObject(type));
-}
-
 void world::world::processInputs(movement id) {
     playerchar->processInput(id);
 }
+
+void world::world::loadRoom(std::vector<saveFileObject> objects) {
+    entities.clear();
+    std::string type;
+    for (auto i : objects){
+        switch (i.getId()) {
+            case objectID::player:
+                if (playerchar) {
+                    playerchar->setXCoord(i.getX());
+                    playerchar->setYCoord(i.getY());
+                } else {
+                    playerchar = factory->producePlayer(i.getX(), i.getY(), i.getLayer(), i.getScale());
+                }
+                break;
+            case objectID::kevin:
+                type = "kevin";
+                entities.push_back(factory->produceObject(type, i.getX(), i.getY(), i.getLayer(), i.getScale()));
+                break;
+            case objectID::rockWall:
+                type = "rockWall";
+                entities.push_back(factory->produceWall(type, i.getX(), i.getY(), i.getLayer(), i.getScale()));
+                break;
+        }
+    }
+    if (not playerchar){
+        playerchar = factory->producePlayer(0, 0, 9, 2.5);
+    }
+}
+
 

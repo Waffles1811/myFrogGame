@@ -8,13 +8,16 @@ void world::stationaryObject::timeUp(float time) {
     positionCamera->updateCoords(x, y);
 }
 
-world::stationaryObject::stationaryObject(std::string& _type, float xCoord, float yCoord,
+world::stationaryObject::stationaryObject(objectID _type, float xCoord, float yCoord,
                                           float hitboxXCoord, float hitboxYCoord) : object(xCoord, yCoord)  {
     hitbox = std::make_shared<world::rectHitbox>(hitboxXCoord, hitboxYCoord, 0, 0, false);
     hitbox->setX(xCoord);
     hitbox->setY(yCoord);
+    type = _type;
 }
 
 int world::stationaryObject::handleCollision(int id) {
     return id;
 }
+
+

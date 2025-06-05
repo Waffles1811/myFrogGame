@@ -3,16 +3,19 @@
 #include "memory"
 #include <map>
 #include "viewEntity.h"
+#include "button.h"
 namespace repr {
     class view {
-        std::vector<std::shared_ptr<viewEntity>> entities;
+        std::vector<std::vector<std::shared_ptr<viewEntity>>> entities;
+        std::vector<std::shared_ptr<button>> buttons;
     public:
         std::unique_ptr<sf::RenderWindow> window;
 
-
         view();
-        void addentity(std::shared_ptr<viewEntity>);
-        void makeframe(float xDimension, float yDimension, float time);
+        void addEntity(std::shared_ptr<viewEntity>, int layer);
+        void addButton(std::shared_ptr<button>);
+        void makeFrame(float xDimension, float yDimension, float time);
+        void reset();
     };
 }
 

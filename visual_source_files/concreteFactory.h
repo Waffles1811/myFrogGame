@@ -12,8 +12,9 @@ class concreteFactory : public world::abstractFactory {
     public:
         concreteFactory(std::shared_ptr<repr::view>);
         world::entity* produceEntity() override;
-        std::shared_ptr<world::player> producePlayer() override;
-        std::shared_ptr<world::stationaryObject> produceObject(std::string& type) override;
+        std::shared_ptr<world::player> producePlayer(float x, float y, int layer, float scale) override;
+        std::shared_ptr<world::stationaryObject> produceObject(std::string& type, float x, float y, int layer, float scale) override;
+        std::shared_ptr<world::stationaryObject> produceWall(std::string& type, float x, float y, int layer, float scale) override;
 };
 }
 

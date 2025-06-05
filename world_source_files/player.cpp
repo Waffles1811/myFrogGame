@@ -19,6 +19,12 @@ enum player_physics{ // divide things by 100.0 if they have "time" in their name
 
 world::player::player() : entity(0, 0) {
     hitbox = std::make_shared<world::rectHitbox>(55, 35, 0, 0, false);
+    type : objectID::player;
+}
+
+world::player::player(float x, float y) : entity(x, y) {
+    hitbox = std::make_shared<world::rectHitbox>(55, 35, 0, 0, false);
+    type : objectID::player;
 }
 
 void world::player::initialize(){
@@ -62,7 +68,6 @@ void world::player::setAnimationCameras(std::shared_ptr<world::animationObserver
 const std::shared_ptr<world::animationHandler> &world::player::getAnimationHandling() const {
     return animationHandling;
 }
-
 
 
 void world::inputHandler::processInput(enum movement input) {
@@ -122,7 +127,7 @@ void world::playerMovement::timeUp(float time) {
             ySpeed -= downwardsGravity * time;
         }
     } else {
-        if (goingRight){
+        if (goingRight or goingLeft){
             player_entity.lock()->getAnimationHandling()->processAnimation(animation::walk);
         }
     }
@@ -197,11 +202,13 @@ void world::playerMovement::goRight(){
     goingLeft = false;
     goingRight = true;
     player_entity.lock()->getAnimationHandling()->turn(false);
-
 }
 
 void world::playerMovement::stopLeft(){
     goingLeft = false;
+    if (grounded) {
+        player_entity.lock()->getAnimationHandling()->processAnimation(animation::none);
+    }
 }
 
 void world::playerMovement::stopRight(){

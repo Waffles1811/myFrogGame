@@ -3,11 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include "concreteCamera.h"
-#include "../json.hpp"
 using json = nlohmann::json;
 namespace repr {
     class animationHandler;
     class viewEntity : public std::enable_shared_from_this<viewEntity> {
+    protected:
         std::unique_ptr<sf::Texture> texture;
         std::shared_ptr<sf::Sprite> sprite;
         std::shared_ptr<concreteCamera> camera;
@@ -16,17 +16,18 @@ namespace repr {
         sf::IntRect spriteRect;
         std::string type;
         float scale;
-        int xOffset; // sometime animations need us to add an offset since the left top corner might change
+        int leftXOffset; // sometime animations need us to add an offset since the left top corner might change
+        int rightXOffset;
         int yOffset;
         bool curDirection;
     public:
-        viewEntity(std::string& _type, std::shared_ptr<concreteCamera> _camera, float _scale);
-        sf::Sprite getSprite(float xDimension, float yDimension, float time);
+        viewEntity(std::string& _type, std::string& folder, std::shared_ptr<concreteCamera> _camera, float _scale);
+        virtual sf::Sprite getSprite(float xDimension, float yDimension, float time);
         void initialize(std::shared_ptr<concreteAnimationObserver> _obs,
                         std::shared_ptr<concreteOrientationObserver> orobs);
         void setTextureBox(int newX, int newY);
         void setTexture(std::string& _texture, float newLength, float newHeight);
-        void setOffsets(int xOffset, int yOffset);
+        void setOffsets(int leftXOffset, int rightXOffset, int yOffset);
         void defaultTexture();
         };
 
@@ -37,8 +38,6 @@ namespace repr {
         std::weak_ptr<viewEntity> sprite;
         std::vector<float> frameDurations; // in milliseconds
         animation curAnimation;
-        int visualXOffset;
-        int visualYOffsets;
         float timeSinceLastFrame;
         int curFrame;
         int curX; // where in the sprite sheet we are now

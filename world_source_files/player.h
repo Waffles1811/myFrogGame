@@ -36,6 +36,7 @@ namespace world {
         std::shared_ptr<animationHandler> animationHandling;
     public:
         player();
+        player(float x, float y);
         void initialize();
         void timeUp(float time) override;
         void processInput(enum movement input);
@@ -44,8 +45,7 @@ namespace world {
         void setAnimationCameras(std::shared_ptr<world::animationObserver> _animobserver,
                                  std::shared_ptr<world::orientationObserver> _orientobserver);
         const std::shared_ptr<animationHandler> &getAnimationHandling() const;
-
-        };
+    };
 
     class inputHandler{
         std::weak_ptr<playerMovement> movement;

@@ -3,18 +3,19 @@
 #include <fstream>
 #include <utility>
 
-repr::viewEntity::viewEntity(std::string& _type, std::shared_ptr<concreteCamera> _camera, float _scale)
+repr::viewEntity::viewEntity(std::string& _type, std::string& folder,
+                             std::shared_ptr<concreteCamera> _camera, float _scale)
                                 : type(_type), camera(std::move(_camera)), scale(_scale) {
     texture = std::unique_ptr<sf::Texture>(new sf::Texture());
-    if (!texture->loadFromFile("assets/" +  _type + "/" + _type + "_default.png")) {
+    if (!texture->loadFromFile("assets/" +  folder + "/" + _type + "_default.png")) {
         throw std::runtime_error(
                 _type + " texture file failed to load.\nPlease ensure"
-                                                     " assets/" +  _type + "/" + _type + "_default.png is present");
+                                                     " assets/" +  folder + "/" + _type + "_default.png is present");
     }
     spriteRect = sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y);
     sprite = std::unique_ptr<sf::Sprite>(new sf::Sprite(*texture, spriteRect));
     sprite->setScale(scale, scale);
-    xOffset = yOffset = 0;
+    leftXOffset = rightXOffset = yOffset = 0;
     curDirection = false;
 }
 
@@ -31,10 +32,11 @@ void repr::viewEntity::defaultTexture(){
                 type + " texture file failed to load.\nPlease ensure"
                         " assets/" +  type + "/" + type + "_default.png is present");
     }
-    spriteRect.top = spriteRect.left = xOffset = yOffset = 0;
+    spriteRect.top = spriteRect.left = rightXOffset = yOffset = 0;
     spriteRect.width = texture->getSize().x;
     spriteRect.height = texture->getSize().y;
-     sprite->setTextureRect(spriteRect);
+    sprite->setTextureRect(spriteRect);
+    leftXOffset = spriteRect.width;
  }
 
 sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float time) {
@@ -46,14 +48,14 @@ sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float
     if (orientationObserver) {
         if (orientationObserver->getDirection() != curDirection) {
             curDirection = orientationObserver->getDirection();
-            if (curDirection){
-                sprite->scale(-1, 1);
-            } else {
-                sprite->scale(-1, 1);
-            }
+            sprite->setScale(-1*scale, scale);
         }
     }
-    sprite->setPosition(x + xOffset * scale, y + yOffset * scale);
+    if (curDirection) {
+        sprite->setPosition(x + leftXOffset * scale , y + yOffset * scale);
+    } else {
+        sprite->setPosition(x + rightXOffset * scale, y + yOffset * scale);
+    }
     return *sprite;
 }
 
@@ -73,8 +75,9 @@ void repr::viewEntity::setTexture(std::string &_texture, float newLength, float 
     sprite->setTextureRect(spriteRect);
 }
 
-void repr::viewEntity::setOffsets(int _xOffset, int _yOffset) {
-    xOffset = _xOffset;
+void repr::viewEntity::setOffsets(int _leftXOffset, int _rightXOffset, int _yOffset) {
+    leftXOffset = spriteRect.width - _leftXOffset;
+    rightXOffset = _rightXOffset;
     yOffset = _yOffset;
 }
 
@@ -86,7 +89,6 @@ repr::animationHandler::animationHandler(std::string & type, std::shared_ptr<con
     inAnimation = repeatingAnimation = false;
     timeSinceLastFrame = 0.0;
     xOffset = curX = curY = curFrame = 0;
-    visualXOffset = visualYOffsets = {};
     std::ifstream file("assets/" + type + "/" + type +"_animations.JSON");
     animation_data = json::parse(file);
     curAnimation = animation::none;
@@ -137,8 +139,6 @@ void repr::animationHandler::startAnimation(animation type){
     std::string filename = data["file"];
     frameDurations.erase(frameDurations.begin(), frameDurations.end());
     frameDurations = data["frameDurations"].get<std::vector<float>>();
-    visualXOffset = data["displayXOffset"];
-    visualYOffsets = data["displayYOffset"];
     curX = data["startXOffset"];
     curY = data["startYOffset"];
     xOffset = data["xOffset"];
@@ -147,7 +147,7 @@ void repr::animationHandler::startAnimation(animation type){
     inAnimation = true;
     sprite.lock()->setTexture(filename, xOffset, data["ySize"]);
     sprite.lock()->setTextureBox(curX, curY);
-    sprite.lock()->setOffsets(visualXOffset, visualYOffsets);
+    sprite.lock()->setOffsets(data["LDisplayXOffset"], data["RDisplayXOffset"], data["displayYOffset"]);
     curAnimation = type;
 }
 

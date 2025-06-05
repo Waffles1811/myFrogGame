@@ -9,8 +9,6 @@
 namespace world {
     class object : public entity {
     protected:
-        std::string type;
-
         object(float x, float y);
     public:
         void timeUp(float time) override = 0;

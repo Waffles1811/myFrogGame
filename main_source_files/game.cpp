@@ -3,25 +3,28 @@
 //
 
 #include "game.h"
+
 game::game() {
     playerView = std::make_shared<repr::view>();
     std::shared_ptr<repr::concreteFactory> factory = std::make_shared<repr::concreteFactory>(playerView);
     world = std::unique_ptr<world::world>( new world::world(factory));
     stopwatchInc = std::unique_ptr<world::stopwatchFactory>(new world::stopwatchFactory());
+    buttons = {};
 }
 
 void game::setup() {
-    world->setup();
+    loadFromFile("newRoom.room");
 }
 
 void game::main_game_loop() {
-    float timeSinceLastTic = stopwatchInc->getStopwatch()->timeTic();
+    float timeSinceLastTic;
+    stopwatchInc->getStopwatch()->timeTic();
     // called here so it isn't too long later
     while (playerView->window->isOpen()) {
         timeSinceLastTic = stopwatchInc->getStopwatch()->timeTic();
         processInputs();
         world->time_up(timeSinceLastTic);
-        playerView->makeframe(0, 0, timeSinceLastTic);
+        playerView->makeFrame(0, 0, timeSinceLastTic);
         // ^^ change these numbers at some point :) probably get them from camera looking at player position
     }
 }
@@ -74,3 +77,16 @@ void game::processInputs() {
         }
     }
 }
+
+void game::loadFromFile(std::string fileName) {
+    // reads file
+    std::ifstream file(fileName, std::ios::binary);
+    uint32_t objectCount;
+    file.read(reinterpret_cast<char*>(&objectCount), sizeof(objectCount));
+    std::vector<saveFileObject> objects(objectCount);
+    file.read(reinterpret_cast<char*>(objects.data()), sizeof(saveFileObject) * objectCount);
+    file.close();
+    playerView->reset();
+    world->loadRoom(objects);
+}
+

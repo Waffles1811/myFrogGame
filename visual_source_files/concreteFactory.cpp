@@ -15,8 +15,8 @@ world::entity* repr::concreteFactory::produceEntity() {
     return nullptr;
 }
 
-std::shared_ptr<world::player> repr::concreteFactory::producePlayer() {
-    std::shared_ptr<world::player> player = std::make_shared<world::player>(world::player());
+std::shared_ptr<world::player> repr::concreteFactory::producePlayer(float x, float y, int layer, float scale) {
+    std::shared_ptr<world::player> player = std::make_shared<world::player>(world::player(x, y));
     player->initialize();
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
     player->setpCam(cam);
@@ -24,20 +24,31 @@ std::shared_ptr<world::player> repr::concreteFactory::producePlayer() {
     std::shared_ptr<repr::concreteOrientationObserver> orobs = std::make_shared<repr::concreteOrientationObserver>();
     player->setAnimationCameras(obs, orobs);
     std::string name = "player";
-    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, cam, 2.5);
+    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, name, cam, scale);
     model->initialize(obs, orobs);
-    playerView->addentity(model);
+    playerView->addEntity(model, layer);
     return player;
 }
 
-std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceObject(std::string& type) {
+std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceObject(std::string& type, float x, float y,
+                                                                              int layer, float scale) {
     std::shared_ptr<world::stationaryObject> object
-                = std::make_shared<world::stationaryObject>(type, 300, -524, 136, 136);
+                = std::make_shared<world::stationaryObject>(objectID::kevin, x, -y, 136*scale, 136*scale);
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
     object->setpCam(cam);
-    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(type, cam, 1);
-    model->initialize(nullptr, nullptr);
-    playerView->addentity(model);
+    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(type, type, cam, scale);
+    playerView->addEntity(model, layer);
+    return object;
+}
+
+std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceWall(std::string &type, float x, float y, int layer, float scale) {
+    std::shared_ptr<world::stationaryObject> object
+            = std::make_shared<world::stationaryObject>(objectID::rockWall, x, y, 50, 50);
+    std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
+    object->setpCam(cam);
+    std::string folder = "wall";
+    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(type, folder, cam, scale);
+    playerView->addEntity(model, layer);
     return object;
 }
 

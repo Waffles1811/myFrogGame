@@ -13,20 +13,20 @@ world::rectHitbox::rectHitbox(float _length, float _height, float _x_offset, flo
 
 int world::rectHitbox::detectCollision(world::rectHitbox& otherBox, float xDif, float yDif) {
     if (getLeftX() - otherBox.getRightX() < 0 and getRightX() - otherBox.getLeftX() > 0
-        and getDownY()-yDif > otherBox.getUpY() - 0.25 and otherBox.getUpY() + 0.25 > getDownY()) {
+        and getDownY()-yDif > otherBox.getUpY() - 0.1 and otherBox.getUpY() + 0.1 > getDownY()) {
         if (killsYou){
             return 5;
         } else {
             return 1;
         }
     } else if (getUpY() - otherBox.getDownY() > 0 and getDownY() - otherBox.getUpY() < 0) {
-        if (getLeftX() < otherBox.getRightX() + 0.5 and otherBox.getRightX() - 0.5 < (getLeftX() - xDif)) {
+        if (getLeftX() < otherBox.getRightX() + 0.1 and otherBox.getRightX() - 0.1 < (getLeftX() - xDif)) {
             if (killsYou){
                 return 5;
             } else {
                 return 3;
             }
-        } else if(getRightX() - xDif < otherBox.getLeftX() + 0.5 and  otherBox.getLeftX() - 0.5 < getRightX()){
+        } else if(getRightX() - xDif < otherBox.getLeftX() + 0.1 and  otherBox.getLeftX() - 0.1 < getRightX()){
             if (killsYou) {
                 return 5;
             } else {

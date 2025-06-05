@@ -18,17 +18,18 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 7. [x] improve jumping with variable jump height and faster falling
 8. [ ] apex modifier
 9. [ ] air resistance
+10. [ ] tongue pulling
 
 ### design:
-1. [ ] Figure out a way to handle textures 
-2. [ ] Figure out a way to handle levels
+1. [X] Figure out a way to handle textures 
+2. [X] Figure out a way to handle levels
 3. [ ] Level-editor
 
 ### interface:
 1. [x] DECIDE UPON A VISUAL THEME: FROG
 
 #### animations:
-1. [ ] left and right        
+1. [X] left and right        
 2. [ ] grabbing             
 3. [ ] dash                 
 4. [x] walk                    

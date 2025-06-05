@@ -24,7 +24,10 @@ if(USE_VERSION_A)  # version with library
             player.cpp
             visual_source_files/concreteFactory.cpp
             object.cpp
-            object.h
+            levelEditor.cpp
+            visual_source_files/button.cpp
+            main_source_files/levelEditorApp.cpp
+
     )
 else() # version without library
     set(SRC_FILES
@@ -44,9 +47,10 @@ else() # version without library
             visual_source_files/viewEntity.cpp
             visual_source_files/concreteCamera.cpp
             world_source_files/stationaryObject.cpp
-            world_source_files/stationaryObject.h
             world_source_files/object.cpp
-            world_source_files/object.h
+            world_source_files/levelEditor.cpp
+            visual_source_files/button.cpp
+            main_source_files/levelEditorApp.cpp
     )
 endif()
 
