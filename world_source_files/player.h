@@ -45,6 +45,8 @@ namespace world {
         void setAnimationCameras(std::shared_ptr<world::animationObserver> _animobserver,
                                  std::shared_ptr<world::orientationObserver> _orientobserver);
         const std::shared_ptr<animationHandler> &getAnimationHandling() const;
+        void fall();
+        void releaseWall();
     };
 
     class inputHandler{
@@ -58,7 +60,6 @@ namespace world {
     public:
         float xSpeed;
         float ySpeed;
-    private:
         std::weak_ptr<player> player_entity;
         bool goingLeft;
         bool goingRight;
@@ -81,7 +82,6 @@ namespace world {
         float coyoteTime;
         float jumpBufferTime;
 
-    public:
         playerMovement(std::weak_ptr<player>);
         void timeUp(float time);
         void reset();

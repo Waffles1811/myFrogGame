@@ -65,6 +65,14 @@ const std::shared_ptr<world::animationHandler> &world::player::getAnimationHandl
     return animationHandling;
 }
 
+void world::player::fall() {
+    movement->fall();
+}
+
+void world::player::releaseWall(){
+    movement->noWall();
+}
+
 
 void world::inputHandler::processInput(enum movement input) {
     switch (input){
@@ -268,7 +276,6 @@ void world::playerMovement::jump(){
     }
 }
 
-
 void world::playerMovement::stopJump() {
     jumping = false;
 }
@@ -282,13 +289,14 @@ void world::playerMovement::land(float height) {
             jump();
         }
         else {
-            ySpeed = 0;
-            grounded = true;
-            canDash = true;
-            wallClingTime = 3;
-            player_entity.lock()->setYCoord(height);
-            player_entity.lock()->getAnimationHandling()->processAnimation(animation::land);
-
+            if (not grounded) {
+                ySpeed = 0;
+                grounded = true;
+                canDash = true;
+                wallClingTime = 3;
+                player_entity.lock()->setYCoord(height + 0.1);
+                player_entity.lock()->getAnimationHandling()->processAnimation(animation::land);
+            }
         }
     }
 }
@@ -298,7 +306,6 @@ void world::playerMovement::fall() {
         grounded = false;
         coyoteTime = 0.1;
     }
-
 }
 
 void world::playerMovement::dash(){
@@ -376,8 +383,8 @@ void world::collisionHandler::handleCollision(int id, const std::shared_ptr<enti
     id = hitObject->handleCollision(id); // for object that allow you to go through them or sum
     switch (id) {
         case 0:
-            movement.lock()->fall();
-            movement.lock()->noWall();
+            //movement.lock()->fall();
+            //movement.lock()->noWall();
             break;
         case 1: // from above
             movement.lock()->land(hitObject->getHitbox()->getUpY() + player_entity.lock()->getHitbox()->height);
@@ -394,6 +401,7 @@ void world::collisionHandler::handleCollision(int id, const std::shared_ptr<enti
             break;
         case 5:
             respawn();
+            break;
         default:
             break;
     }

@@ -14,10 +14,24 @@ void world::world::time_up(float time) {
     float oldPlayerX = playerchar->getXCoord();
     float oldPlayerY = playerchar->getYCoord();
     playerchar->timeUp(time);
+    // collisions detection (gotta improve ts)
+    bool groundedThisLoop  = false;
+    bool touchedWallThisLoop = false;
     for (auto & i : entities){
         int result = playerchar->getHitbox()->detectCollision(*i->getHitbox(), playerchar->getXCoord() - oldPlayerX,
                                                                                   playerchar->getYCoord() - oldPlayerY);
+        if (result == 1){
+            groundedThisLoop = true;
+        } else if (result == 3 or result == 4){
+            touchedWallThisLoop = true;
+        }
         playerchar->handleCollision(result, i);
+    }
+    if (not groundedThisLoop){
+        playerchar->fall();
+    }
+    if (not touchedWallThisLoop){
+        playerchar->releaseWall();
     }
 }
 

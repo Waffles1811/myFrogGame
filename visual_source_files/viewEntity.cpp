@@ -149,6 +149,7 @@ void repr::animationHandler::startAnimation(animation type){
     sprite.lock()->setTextureBox(curX, curY);
     sprite.lock()->setOffsets(data["LDisplayXOffset"], data["RDisplayXOffset"], data["displayYOffset"]);
     curAnimation = type;
+    timeSinceLastFrame = 0;
 }
 
 void repr::animationHandler::continueAnimation(float time){
@@ -156,19 +157,18 @@ void repr::animationHandler::continueAnimation(float time){
         return;
     }
     time *= 1000;
-    if (curFrame > frameDurations.size()-1){
+    timeSinceLastFrame += time;
+    if (timeSinceLastFrame > frameDurations[curFrame]){
+        timeSinceLastFrame = 0.0;
+        curFrame++;
+        curX += xOffset;
+        sprite.lock()->setTextureBox(curX, curY);
+    } else if (curFrame > frameDurations.size()-1){
         if (repeatingAnimation){
             startAnimation(curAnimation);
         } else {
             stopAnimation();
         }
-    } else if (timeSinceLastFrame > frameDurations[curFrame]){
-        timeSinceLastFrame = 0.0;
-        curFrame++;
-        curX += xOffset;
-        sprite.lock()->setTextureBox(curX, curY);
-    } else {
-        timeSinceLastFrame += time;
     }
 }
 

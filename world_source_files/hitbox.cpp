@@ -12,28 +12,47 @@ world::rectHitbox::rectHitbox(float _length, float _height, float _x_offset, flo
     : hitbox(_x_offset, _y_offset), length(_length), height(_height), killsYou(_killsYou) {}
 
 int world::rectHitbox::detectCollision(world::rectHitbox& otherBox, float xDif, float yDif) {
-    if (getLeftX() - otherBox.getRightX() < 0 and getRightX() - otherBox.getLeftX() > 0
-        and getDownY()-yDif > otherBox.getUpY() - 0.1 and otherBox.getUpY() + 0.1 > getDownY()) {
+    // beneath player
+    point point1 = point(getLeftX()+0.1*length, getDownY()-0.25);
+    point point2 = point(getRightX()-0.1*length, getDownY()-0.25);
+    if (point1.checkInHitbox(otherBox) or point2.checkInHitbox(otherBox)){
         if (killsYou){
             return 5;
         } else {
             return 1;
         }
-    } else if (getUpY() - otherBox.getDownY() > 0 and getDownY() - otherBox.getUpY() < 0) {
-        if (getLeftX() < otherBox.getRightX() + 0.5 and otherBox.getRightX() - 0.5 < (getLeftX() - xDif)) {
-            if (killsYou){
-                return 5;
-            } else {
-                return 3;
-            }
-        } else if(getRightX() - xDif < otherBox.getLeftX() + 0.5 and  otherBox.getLeftX() - 0.5 < getRightX()){
-            if (killsYou) {
-                return 5;
-            } else {
-                return 4;
-            }
+    }
+    //above player
+    point1 = point(getLeftX()+0.1*length, getUpY()+0.25);
+    point2 = point(getRightX()-0.1*length, getUpY()+0.25);
+    if (point1.checkInHitbox(otherBox) or point2.checkInHitbox(otherBox)){
+        if (killsYou){
+            return 5;
+        } else {
+            return 2;
         }
     }
+    // left of player
+    point1 = point(getLeftX()-0.25, getUpY());
+    point2 = point(getLeftX()-0.25, getDownY());
+    if (point1.checkInHitbox(otherBox) or point2.checkInHitbox(otherBox)){
+        if (killsYou){
+            return 5;
+        } else {
+            return 3;
+        }
+    }
+    // right of player
+    point1 = point(getRightX()+0.25, getUpY());
+    point2 = point(getRightX()+0.25, getDownY());
+    if (point1.checkInHitbox(otherBox) or point2.checkInHitbox(otherBox)){
+        if (killsYou){
+            return 5;
+        } else {
+            return 4;
+        }
+    }
+
     return 0;
 }
 
@@ -48,4 +67,14 @@ float world::rectHitbox::getUpY(){
 }
 float world::rectHitbox::getDownY(){
     return y - height;
+}
+
+world::point::point(float _x, float _y) : x(_x), y(_y) {}
+
+bool world::point::checkInHitbox(world::rectHitbox & hitbox) {
+    if (x > hitbox.getLeftX() and x < hitbox.getRightX() and y < hitbox.getUpY() and y > hitbox.getDownY()){
+        return true;
+    } else {
+        return false;
+    }
 }
