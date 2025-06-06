@@ -5,6 +5,6 @@ float world::stopwatch::timeTic() {
     duration<float> elapsedTime = duration_cast<duration<float>>(curTime - start_tic);
     start_tic = curTime;
     // std::cout << elapsedTime.count() << std::endl;
-    return 0.01;
-    //return elapsedTime.count();
+    // return 0.01; // for debugging
+    return elapsedTime.count(); // for real stuff
 }
