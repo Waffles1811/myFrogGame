@@ -163,7 +163,8 @@ void repr::animationHandler::continueAnimation(float time){
         curFrame++;
         curX += xOffset;
         sprite.lock()->setTextureBox(curX, curY);
-    } else if (curFrame > frameDurations.size()-1){
+    }
+    if (curFrame > frameDurations.size()-1){
         if (repeatingAnimation){
             startAnimation(curAnimation);
         } else {

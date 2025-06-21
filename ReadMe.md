@@ -8,9 +8,10 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 
 ## todo:
 
-### logic:
+## logic:
+### movement:
 1. [ ] respawning
-2. [x] collisions fix (allow for different effects)
+2. [x] collisions (allow for different effects)
 3. [x] jump buffering
 4. [x] Coyote time
 5. [ ] add more types of obstacles
@@ -24,8 +25,23 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 2. [X] Figure out a way to handle levels (binary format)
 3. [X] Level-editor
 
+### level-editor:
+1. [X] placing things
+2. [ ] removing things
+3. [ ] undo
+4. [ ] redo
+5. [ ] moving camera around
+6. [ ] layers
+7. [ ] scale (slider?)
+8. [X] saving levels
+
+## visuals:
 ### interface:
 1. [x] DECIDE UPON A VISUAL THEME: FROG
+
+### camera:
+1. [ ] move around
+2. [ ] make it damp
 
 #### animations:
 1. [X] left and right        
@@ -42,3 +58,6 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 4. [ ] walk        
 5. [ ] jump      
 6. [ ] tongue pulling
+
+## known bugs:
+1. [FIXED] character texture disappears when animation is over for a short time
