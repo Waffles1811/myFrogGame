@@ -1,5 +1,6 @@
 #ifndef LITTLEGAME_HITBOX_H
 #define LITTLEGAME_HITBOX_H
+#include <iostream>
 namespace world {
     class hitbox {// I might add hitboxes off different shapes later
     protected:

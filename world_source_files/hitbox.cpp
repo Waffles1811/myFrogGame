@@ -12,6 +12,8 @@ world::rectHitbox::rectHitbox(float _length, float _height, float _x_offset, flo
     : hitbox(_x_offset, _y_offset), length(_length), height(_height), killsYou(_killsYou) {}
 
 int world::rectHitbox::detectCollision(world::rectHitbox& otherBox, float xDif, float yDif) {
+    int retval = 0;
+    float distance = 10000000000; // the lower this number, the better for this
     // beneath player
     point point1 = point(getLeftX()+0.1*length, getDownY()-0.25);
     point point2 = point(getRightX()-0.1*length, getDownY()-0.25);
@@ -19,7 +21,8 @@ int world::rectHitbox::detectCollision(world::rectHitbox& otherBox, float xDif, 
         if (killsYou){
             return 5;
         } else {
-            return 1;
+            retval = 1;
+            distance = otherBox.getUpY() - getDownY();
         }
     }
     //above player
@@ -29,17 +32,23 @@ int world::rectHitbox::detectCollision(world::rectHitbox& otherBox, float xDif, 
         if (killsYou){
             return 5;
         } else {
-            return 2;
+            if (retval == 1){
+                retval = 0;
+                distance = 1000000; // means it's running up against a wall
+            }
         }
     }
     // left of player
-    point1 = point(getLeftX()-0.25, getUpY());
-    point2 = point(getLeftX()-0.25, getDownY());
+    point1 = point(getLeftX()-0.25, getUpY()-0.1*height);
+    point2 = point(getLeftX()-0.25, getDownY()+0.1*height);
     if (point1.checkInHitbox(otherBox) or point2.checkInHitbox(otherBox)){
         if (killsYou){
             return 5;
         } else {
-            return 3;
+            if (otherBox.getRightX() - getLeftX() < distance){
+                distance = otherBox.getRightX() - getLeftX();
+                retval = 3;
+            }
         }
     }
     // right of player
@@ -49,16 +58,19 @@ int world::rectHitbox::detectCollision(world::rectHitbox& otherBox, float xDif, 
         if (killsYou){
             return 5;
         } else {
-            return 4;
+            if (getRightX() - otherBox.getLeftX() < distance){
+                retval = 4;
+            }
         }
     }
 
-    return 0;
+    return retval;
 }
 
 float world::rectHitbox::getLeftX(){
     return x;
 }
+
 float world::rectHitbox::getRightX(){
     return x + length;
 }

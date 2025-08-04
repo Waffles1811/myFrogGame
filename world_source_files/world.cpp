@@ -17,6 +17,7 @@ void world::world::time_up(float time) {
     // collisions detection (gotta improve ts)
     bool groundedThisLoop  = false;
     bool touchedWallThisLoop = false;
+    std::cout << entities.size() << std::endl;
     for (auto & i : entities){
         int result = playerchar->getHitbox()->detectCollision(*i->getHitbox(), playerchar->getXCoord() - oldPlayerX,
                                                                                   playerchar->getYCoord() - oldPlayerY);

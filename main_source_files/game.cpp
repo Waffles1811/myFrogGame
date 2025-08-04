@@ -17,7 +17,7 @@ void game::setup() {
 }
 
 void game::main_game_loop() {
-    float timeSinceLastTic;
+    float timeSinceLastTic = 0;
     stopwatchInc->getStopwatch()->timeTic();
     // called here so it isn't too long later
     while (playerView->window->isOpen()) {

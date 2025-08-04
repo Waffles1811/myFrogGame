@@ -6,7 +6,7 @@
 #include <cmath>
 #include <iostream>
 #include <utility>
-enum player_physics{ // divide things by 100.0 if they have "time" in their name
+enum player_physics{ // divide things by 100.0 if they have "time" in their name bc no floats allowed
     walkSpeed = 400,
     walkAcceleration = 900,
     walkSlowdown = 1500,
@@ -224,6 +224,7 @@ void world::playerMovement::stopRight(){
 
 void world::playerMovement::boinkHead() {
     ySpeed = 0;
+    inDash = false;
 }
 
 void world::playerMovement::hitWall(float length, bool left) {
@@ -368,7 +369,7 @@ void world::playerMovement::endDash(){
 
 world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : player_entity(_player_entity) {
     grounded = goingLeft = goingRight = facingUp = facingDown = canDash = inDash = wallClinging = jumping = touchingWall = false;
-    dashTime = wallClingTime = coyoteTime = jumpingTime = 0.0;
+    dashTime = wallClingTime = coyoteTime = jumpingTime = xSpeed = ySpeed = 0.0;
     dashDirection = 0.0;
 }
 
