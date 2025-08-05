@@ -7,7 +7,9 @@
 #include <utility>
 
 
-repr::concreteFactory::concreteFactory(std::shared_ptr<repr::view> _playerView) : playerView(std::move(_playerView)) {}
+repr::concreteFactory::concreteFactory(std::shared_ptr<repr::view> _playerView) : playerView(std::move(_playerView)) {
+    library = std::make_shared<animationLibrary>(animationLibrary("assets"));
+}
 
 world::entity* repr::concreteFactory::produceEntity() {
     // make entity
@@ -16,38 +18,43 @@ world::entity* repr::concreteFactory::produceEntity() {
 }
 
 std::shared_ptr<world::player> repr::concreteFactory::producePlayer(float x, float y, int layer, float scale) {
+    std::string name = "player";
+    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, name, scale);
+    model->initialiseAnimations(library);
+    std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>(model);
+    std::shared_ptr<repr::concreteAnimationObserver> obs =
+            std::make_shared<repr::concreteAnimationObserver>(model);
+    std::shared_ptr<repr::concreteOrientationObserver> orobs =
+            std::make_shared<repr::concreteOrientationObserver>(model);
     std::shared_ptr<world::player> player = std::make_shared<world::player>(world::player(x, y));
     player->initialize();
-    std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
     player->setpCam(cam);
-    std::shared_ptr<repr::concreteAnimationObserver> obs = std::make_shared<repr::concreteAnimationObserver>();
-    std::shared_ptr<repr::concreteOrientationObserver> orobs = std::make_shared<repr::concreteOrientationObserver>();
     player->setAnimationCameras(obs, orobs);
-    std::string name = "player";
-    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, name, cam, scale);
-    model->initialize(obs, orobs);
     playerView->addEntity(model, layer);
     return player;
 }
 
 std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceObject(std::string& type, float x, float y,
                                                                               int layer, float scale) {
-    std::shared_ptr<world::stationaryObject> object
-                = std::make_shared<world::stationaryObject>(objectID::kevin, x, -y, 136*scale, 136*scale);
-    std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
+
+    std::string name = "kevin";
+    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, name, scale);
+    model->initialiseAnimations(library);
+    std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>(model);
+    std::shared_ptr<world::stationaryObject> object = std::make_shared<world::stationaryObject>(objectID::kevin, x, y, 136*scale, 136*scale);
     object->setpCam(cam);
-    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(type, type, cam, scale);
     playerView->addEntity(model, layer);
     return object;
 }
 
 std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceWall(std::string &type, float x, float y, int layer, float scale) {
-    std::shared_ptr<world::stationaryObject> object
-            = std::make_shared<world::stationaryObject>(objectID::rockWall, x, y, 50, 50);
-    std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>();
-    object->setpCam(cam);
     std::string folder = "wall";
-    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(type, folder, cam, scale);
+    std::string name = "rockWall";
+    std::shared_ptr<repr::viewEntity> model = std::make_shared<repr::viewEntity>(name, folder, scale);
+    model->initialiseAnimations(library);
+    std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>(model);
+    std::shared_ptr<world::stationaryObject> object = std::make_shared<world::stationaryObject>(objectID::rockWall, x, y, 50*scale, 50*scale);
+    object->setpCam(cam);
     playerView->addEntity(model, layer);
     return object;
 }

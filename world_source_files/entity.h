@@ -36,6 +36,7 @@ namespace world {
         objectID getID() const;
         void setXCoord(float _x);
         void setYCoord(float _y);
+        void setCoords(float, float);
         std::shared_ptr<world::rectHitbox> getHitbox();
         void setpCam(std::shared_ptr<entitycamera> newCam);
         virtual void timeUp(float time) = 0;

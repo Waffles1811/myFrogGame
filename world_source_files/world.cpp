@@ -3,8 +3,6 @@
 //
 
 #include "world.h"
-
-#include <utility>
 world::world::world(std::shared_ptr<abstractFactory> _factory) : factory(std::move(_factory)) {}
 
 void world::world::time_up(float time) {
@@ -17,7 +15,6 @@ void world::world::time_up(float time) {
     // collisions detection (gotta improve ts)
     bool groundedThisLoop  = false;
     bool touchedWallThisLoop = false;
-    std::cout << entities.size() << std::endl;
     for (auto & i : entities){
         int result = playerchar->getHitbox()->detectCollision(*i->getHitbox(), playerchar->getXCoord() - oldPlayerX,
                                                                                   playerchar->getYCoord() - oldPlayerY);
@@ -58,6 +55,7 @@ void world::world::loadRoom(std::vector<saveFileObject> objects) {
                 entities.push_back(factory->produceObject(type, i.getX(), i.getY(), i.getLayer(), i.getScale()));
                 break;
             case objectID::rockWall:
+                std::cout << "spawned ";
                 type = "rockWall";
                 entities.push_back(factory->produceWall(type, i.getX(), i.getY(), i.getLayer(), i.getScale()));
                 break;

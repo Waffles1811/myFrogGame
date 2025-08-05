@@ -32,9 +32,23 @@ std::shared_ptr<world::rectHitbox> world::entity::getHitbox() {
 
 void world::entity::setXCoord(float _x) {
     x = _x;
+    if (positionCamera){
+        positionCamera->updateCoords(x, y);
+    }
 }
 void world::entity::setYCoord(float _y) {
     y = _y;
+    if (positionCamera){
+        positionCamera->updateCoords(x, y);
+    }
+}
+
+void world::entity::setCoords(float _x, float _y){
+    x = _x;
+    y = _y;
+    if (positionCamera){
+        positionCamera->updateCoords(x, y);
+    }
 }
 
 int world::entity::handleCollision(int id) {

@@ -5,14 +5,7 @@
 #ifndef LITTLEGAME_ENTITYCAMERA_H
 #define LITTLEGAME_ENTITYCAMERA_H
 #include <map>
-enum class animation{
-    jump,
-    land,
-    fall,
-    walk,
-    none
-};
-
+#include <string>
 namespace world {
     class entitycamera {
     public:
@@ -27,7 +20,7 @@ namespace world {
         animationObserver() = default;
         virtual ~animationObserver() = default;
 
-        virtual void startAnimation(animation) = 0;
+        virtual void startAnimation(std::string anim) = 0;
     };
 
     class orientationObserver {

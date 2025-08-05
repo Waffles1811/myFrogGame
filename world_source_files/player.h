@@ -127,7 +127,7 @@ namespace world {
     public:
         animationHandler();
         ~animationHandler() = default;
-        void processAnimation(animation animationID);
+        void processAnimation(std::string animationID);
         void setAnimationCameras(std::shared_ptr<world::animationObserver> _animobserver,
                                 std::shared_ptr<world::orientationObserver> _orientobserver);
         void turn(bool direction);

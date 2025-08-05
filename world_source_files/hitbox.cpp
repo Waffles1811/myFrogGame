@@ -35,6 +35,9 @@ int world::rectHitbox::detectCollision(world::rectHitbox& otherBox, float xDif, 
             if (retval == 1){
                 retval = 0;
                 distance = 1000000; // means it's running up against a wall
+            } else {
+                retval = 2;
+                distance = getUpY() - otherBox.getDownY();
             }
         }
     }

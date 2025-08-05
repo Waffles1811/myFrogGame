@@ -6,6 +6,7 @@
 #define LITTLEGAME_CONCRETECAMERA_H
 #include "../world_source_files/entitycamera.h"
 #include "../world_source_files/entity.h"
+#include "viewEntity.h"
 
 namespace world {
     class entitycamera;  // Forward declaration
@@ -13,34 +14,31 @@ namespace world {
 
 namespace repr {
     class concreteCamera : public world::entitycamera {
-        float x;
-        float y;
+        std::shared_ptr<viewEntity> model;
     public:
-        concreteCamera() = default;
+        concreteCamera(std::shared_ptr<viewEntity>);
         void updateCoords(float _x, float _y) override;
         ~concreteCamera() override = default;
-        float getXcoord(float xHeight);
-        float getYcoord(float Ylength);
     };
 
     class concreteAnimationObserver : public world::animationObserver {
     private:
-        animation curAnimation;
+        std::string curAnimation;
+        std::shared_ptr<viewEntity> model;
     public:
-        concreteAnimationObserver();
+        concreteAnimationObserver(std::shared_ptr<viewEntity>);
         ~concreteAnimationObserver() = default;
 
-        void startAnimation(animation) override;
+        void startAnimation(std::string anim) override;
         void stopAnimation();
-        animation getAnimation();
-
     };
 
     class concreteOrientationObserver : public  world::orientationObserver {
     private:
         bool facingLeft;
+        std::shared_ptr<viewEntity> model;
     public:
-        concreteOrientationObserver();
+        concreteOrientationObserver(std::shared_ptr<viewEntity>);
         void turn(bool direction) override;
         bool getDirection();
     };

@@ -4,7 +4,7 @@
 
 #include "button.h"
 
-repr::button::button(std::string &_type, std::string &folder, float scale) : viewEntity(_type, folder, nullptr, scale) {
+repr::button::button(std::string &_type, std::string &folder, float scale) : viewEntity(_type, folder, scale) {
     if (_type == "saveButton"){
         type = buttonType::save;
     }

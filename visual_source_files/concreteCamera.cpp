@@ -6,42 +6,37 @@
 
 
 void repr::concreteCamera::updateCoords(const float _x, const float _y) {
-    x = _x;
-    y = _y;
+    model->updatePosition(_x, -_y);
 }
 
-float repr::concreteCamera::getXcoord(float xLength) {
-    return x-xLength;
-}
-
-float repr::concreteCamera::getYcoord(float YHeight) {
-    return -(y-YHeight);
-}
+repr::concreteCamera::concreteCamera(std::shared_ptr<viewEntity> _model) : model(_model) {}
 
 
-animation repr::concreteAnimationObserver::getAnimation() {
-    return curAnimation;
-}
-
-void repr::concreteAnimationObserver::startAnimation(animation newAnimation) {
+void repr::concreteAnimationObserver::startAnimation(std::string newAnimation) {
     if (curAnimation != newAnimation){
+        std::cout << newAnimation << std::endl;
+        model->startAnimation(newAnimation);
         curAnimation = newAnimation;
     }
 }
 
-repr::concreteAnimationObserver::concreteAnimationObserver() {
-    curAnimation = animation::none;
+repr::concreteAnimationObserver::concreteAnimationObserver(std::shared_ptr<viewEntity> _model) : model(_model) {
+    curAnimation == "default";
 }
 
 void repr::concreteAnimationObserver::stopAnimation() {
-    curAnimation = animation::none;
+    curAnimation == "default";
+    model->startAnimation(curAnimation);
 }
 
 void repr::concreteOrientationObserver::turn(bool direction) {
-    facingLeft = direction;
+    if (facingLeft != direction){
+        model->changeOrientation();
+        facingLeft = direction;
+    }
 }
 
-repr::concreteOrientationObserver::concreteOrientationObserver() {
+repr::concreteOrientationObserver::concreteOrientationObserver(std::shared_ptr<viewEntity> _model) : model(_model) {
     facingLeft = false;
 }
 

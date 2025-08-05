@@ -3,9 +3,8 @@
 #include <fstream>
 #include <utility>
 
-repr::viewEntity::viewEntity(std::string& _type, std::string& folder,
-                             std::shared_ptr<concreteCamera> _camera, float _scale)
-                                : type(_type), camera(std::move(_camera)), scale(_scale) {
+repr::viewEntity::viewEntity(std::string& _type, std::string& folder, float _scale)
+                                : type(_type), scale(_scale) {
     texture = std::unique_ptr<sf::Texture>(new sf::Texture());
     if (!texture->loadFromFile("assets/" +  folder + "/" + _type + "_default.png")) {
         throw std::runtime_error(
@@ -19,42 +18,28 @@ repr::viewEntity::viewEntity(std::string& _type, std::string& folder,
     curDirection = false;
 }
 
-void repr::viewEntity::initialize(std::shared_ptr<concreteAnimationObserver> _obs,
-                                  std::shared_ptr<concreteOrientationObserver> orobs) {
-    animationHandling = std::unique_ptr<repr::animationHandler>(
-            new animationHandler(type, std::move(_obs), shared_from_this()));
-    orientationObserver = orobs;
-}
-
 void repr::viewEntity::defaultTexture(){
     if (!texture->loadFromFile("assets/" +  type + "/" + type + "_default.png")) {
         throw std::runtime_error(
                 type + " texture file failed to load.\nPlease ensure"
                         " assets/" +  type + "/" + type + "_default.png is present");
     }
-    spriteRect.top = spriteRect.left = rightXOffset = yOffset = 0;
     spriteRect.width = texture->getSize().x;
+    if (curDirection) {
+        sprite->setPosition(sprite->getPosition().x - (leftXOffset-spriteRect.width) * scale, sprite->getPosition().y - yOffset * scale);
+    } else {
+        sprite->setPosition(sprite->getPosition().x - rightXOffset * scale, sprite->getPosition().y - yOffset * scale);
+
+    }
+    spriteRect.top = spriteRect.left = rightXOffset = yOffset = 0;
     spriteRect.height = texture->getSize().y;
     sprite->setTextureRect(spriteRect);
     leftXOffset = spriteRect.width;
  }
 
 sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float time) {
-    float x = camera->getXcoord(xDimension);
-    float y = camera->getYcoord(yDimension);
     if (animationHandling) {
         animationHandling->updateAnimation(time);
-    }
-    if (orientationObserver) {
-        if (orientationObserver->getDirection() != curDirection) {
-            curDirection = orientationObserver->getDirection();
-            sprite->scale(-1, 1);
-        }
-    }
-    if (curDirection) {
-        sprite->setPosition(x + leftXOffset * scale , y + yOffset * scale);
-    } else {
-        sprite->setPosition(x + rightXOffset * scale, y + yOffset * scale);
     }
     return *sprite;
 }
@@ -81,90 +66,96 @@ void repr::viewEntity::setOffsets(int _leftXOffset, int _rightXOffset, int _yOff
     yOffset = _yOffset;
 }
 
+void repr::viewEntity::changeOrientation(){
+    if (curDirection) {
+        sprite->setPosition(sprite->getPosition().x + rightXOffset * scale, sprite->getPosition().y);
+    } else {
+        sprite->setPosition(sprite->getPosition().x + leftXOffset * scale , sprite->getPosition().y);
+    }
+    sprite->scale(-1, 1);
+    curDirection = !curDirection;
+}
 
-repr::animationHandler::animationHandler(std::string & type, std::shared_ptr<concreteAnimationObserver> _obs,
-                                         const std::shared_ptr<viewEntity>& _sprite)
-    : animationObserver(std::move(_obs)) {
+void repr::viewEntity::updatePosition(float newX, float newY){
+    if (curDirection) {
+        sprite->setPosition(newX + leftXOffset * scale , newY + yOffset * scale);
+    } else {
+        sprite->setPosition(newX + rightXOffset * scale, newY + yOffset * scale);
+    }
+}
+
+void repr::viewEntity::startAnimation(std::string anim) {
+    animationHandling->startAnimation(anim);
+}
+
+void repr::viewEntity::initialiseAnimations(std::shared_ptr<animationLibrary> _library) {
+    animationHandling = std::make_unique<animationHandler>(type, shared_from_this(), _library);
+
+}
+
+repr::animationHandler::animationHandler(std::string & _type, const std::shared_ptr<viewEntity> _sprite,
+                                         std::shared_ptr<animationLibrary> _library) : library(_library){
     sprite = _sprite;
     inAnimation = repeatingAnimation = false;
     timeSinceLastFrame = 0.0;
     xOffset = curX = curY = curFrame = 0;
-    std::ifstream file("assets/" + type + "/" + type +"_animations.JSON");
-    animation_data = json::parse(file);
-    curAnimation = animation::none;
+    curAnimation = "default";
+    type = _type;
 }
 
 
 
 void repr::animationHandler::updateAnimation(float time) {
-    if (animationObserver) {
-        animation newAnimation = animationObserver->getAnimation();
-        if (newAnimation == animation::none){
-            if (inAnimation){
-                repeatingAnimation = false;
-                if (curFrame > 1) {
-                    continueAnimation(time);
-                } else {
-                    stopAnimation();
-                }
+    if (curAnimation == "default"){ // if the animation should end we'll complete it first (unless if another animation has been started)
+        if (inAnimation){
+            repeatingAnimation = false;
+            if (curFrame > 1) {
+                continueAnimation(time);
+            } else {
+                stopAnimation();
             }
-        } else if (newAnimation == curAnimation) {
+        }
+    } else {
+        if (inAnimation) {
             continueAnimation(time);
-        } else {
-            startAnimation(newAnimation);
         }
     }
 }
 
-void repr::animationHandler::startAnimation(animation type){
-    std::string animationName;
-    switch (type){
-        case animation::jump:
-            animationName = "jump";
-            break;
-        case animation::land:
-            animationName = "land";
-            break;
-        case animation::fall:
-            animationName = "fall";
-            break;
-        case animation::walk:
-            animationName = "walk";
-            break;
-        case animation::none:
-            animationName = "this isn't supposed to be reachable";
-            break;
+
+void repr::animationHandler::startAnimation(std::string animType){
+    if (animType != "fall" and animType != "land" and animType != "walk" and animType != "jump"){
+        curAnimation = animType;
     }
-    auto data = animation_data[animationName];
-    std::string filename = data["file"];
-    frameDurations.erase(frameDurations.begin(), frameDurations.end());
-    frameDurations = data["frameDurations"].get<std::vector<float>>();
-    curX = data["startXOffset"];
-    curY = data["startYOffset"];
-    xOffset = data["xOffset"];
-    repeatingAnimation = data ["repeating"];
-    curFrame = 0;
-    inAnimation = true;
-    sprite.lock()->setTexture(filename, xOffset, data["ySize"]);
-    sprite.lock()->setTextureBox(curX, curY);
-    sprite.lock()->setOffsets(data["LDisplayXOffset"], data["RDisplayXOffset"], data["displayYOffset"]);
-    curAnimation = type;
-    timeSinceLastFrame = 0;
+    else {
+        auto data = library->getAnimation(type, animType);
+        std::string filename = data["file"];
+        frameDurations.erase(frameDurations.begin(), frameDurations.end());
+        frameDurations = data["frameDurations"].get<std::vector<float>>();
+        curX = data["startXOffset"];
+        curY = data["startYOffset"];
+        xOffset = data["xOffset"];
+        repeatingAnimation = data["repeating"];
+        curFrame = 0;
+        inAnimation = true;
+        sprite.lock()->setTexture(filename, xOffset, data["ySize"]);
+        sprite.lock()->setTextureBox(curX, curY);
+        sprite.lock()->setOffsets(data["LDisplayXOffset"], data["RDisplayXOffset"], data["displayYOffset"]);
+        curAnimation = animType;
+        timeSinceLastFrame = 0;
+    }
 }
 
 void repr::animationHandler::continueAnimation(float time){
-    if (not inAnimation){
-        return;
-    }
     time *= 1000;
     timeSinceLastFrame += time;
-    if (timeSinceLastFrame > frameDurations[curFrame]){
+    if (timeSinceLastFrame > frameDurations[curFrame]){ // after a while we go to next frame
         timeSinceLastFrame = 0.0;
         curFrame++;
         curX += xOffset;
         sprite.lock()->setTextureBox(curX, curY);
     }
-    if (curFrame > frameDurations.size()-1){
+    if (curFrame > frameDurations.size()-1){ // if last frame has passed
         if (repeatingAnimation){
             startAnimation(curAnimation);
         } else {
@@ -175,8 +166,6 @@ void repr::animationHandler::continueAnimation(float time){
 
 void repr::animationHandler::stopAnimation() {
     sprite.lock()->defaultTexture();
-    curAnimation = animation::none;
-    animationObserver->stopAnimation();
     inAnimation = false;
 }
 

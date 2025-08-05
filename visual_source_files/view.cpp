@@ -1,7 +1,13 @@
 #include "view.h"
 using namespace repr;
-view::view() : window(std::unique_ptr<sf::RenderWindow>(new sf::RenderWindow(sf::VideoMode(1920, 1080),
-                                                                             "froggie jumping", sf::Style::Fullscreen))), entities(11){
+view::view() : entities(11){
+    sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+    window = std::unique_ptr<sf::RenderWindow>(new sf::RenderWindow(
+            sf::VideoMode(desktop.width, desktop.height),
+            "Game",
+            sf::Style::None));
+    window->setPosition(sf::Vector2i(0, 0));  // snap to screen corner
+
     window->setVerticalSyncEnabled(true);
 }
 

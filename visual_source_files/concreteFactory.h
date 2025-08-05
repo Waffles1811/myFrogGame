@@ -6,9 +6,12 @@
 #define LITTLEGAME_CONCRETEFACTORY_H
 #include "../world_source_files/abstractFactory.h"
 #include "view.h"
+#include "../world_source_files/world.h"
+#include "concreteCamera.h"
 namespace repr{
 class concreteFactory : public world::abstractFactory {
         std::shared_ptr<repr::view> playerView;
+        std::shared_ptr<animationLibrary> library;
     public:
         concreteFactory(std::shared_ptr<repr::view>);
         world::entity* produceEntity() override;

@@ -40,8 +40,6 @@ void world::player::timeUp(float time) {
 
     hitbox->setX(x);
     hitbox->setY(y);
-
-    positionCamera->updateCoords(x, y);
 }
 
 void world::player::processInput(enum movement input) {
@@ -126,13 +124,13 @@ void world::playerMovement::timeUp(float time) {
             ySpeed -= jumpingGravity * time;
         } else {
             if (ySpeed < 0) {
-                player_entity.lock()->getAnimationHandling()->processAnimation(animation::fall);
+                player_entity.lock()->getAnimationHandling()->processAnimation("fall");
             }
             ySpeed -= downwardsGravity * time;
         }
     } else {
         if (goingRight or goingLeft){
-            player_entity.lock()->getAnimationHandling()->processAnimation(animation::walk);
+            player_entity.lock()->getAnimationHandling()->processAnimation("walk");
         }
     }
     if (goingLeft and xSpeed > -walkSpeed){
@@ -192,8 +190,8 @@ void world::playerMovement::timeUp(float time) {
             wallClinging = false;
         }
     }
-    player_entity.lock()->setXCoord( player_entity.lock()->getXCoord() + time * xSpeed);
-    player_entity.lock()->setYCoord( player_entity.lock()->getYCoord() + time * ySpeed);
+    player_entity.lock()->setCoords( player_entity.lock()->getXCoord() + time * xSpeed,
+                                     player_entity.lock()->getYCoord() + time * ySpeed);
 }
 
 void world::playerMovement::goLeft() {
@@ -211,14 +209,14 @@ void world::playerMovement::goRight(){
 void world::playerMovement::stopLeft(){
     goingLeft = false;
     if (grounded) {
-        player_entity.lock()->getAnimationHandling()->processAnimation(animation::none);
+        player_entity.lock()->getAnimationHandling()->processAnimation("default");
     }
 }
 
 void world::playerMovement::stopRight(){
     goingRight = false;
     if (grounded) {
-        player_entity.lock()->getAnimationHandling()->processAnimation(animation::none);
+        player_entity.lock()->getAnimationHandling()->processAnimation("default");
     }
 }
 
@@ -271,7 +269,7 @@ void world::playerMovement::jump(){
         jumpingTime = (float) jumpTime/100.0;
         grounded = false;
         ySpeed = jumpSpeed;
-        player_entity.lock()->getAnimationHandling()->processAnimation(animation::jump);
+        player_entity.lock()->getAnimationHandling()->processAnimation("jump");
     } else {
         jumpBufferTime = 0.1;
     }
@@ -296,7 +294,7 @@ void world::playerMovement::land(float height) {
                 canDash = true;
                 wallClingTime = 3;
                 player_entity.lock()->setYCoord(height + 0.1);
-                player_entity.lock()->getAnimationHandling()->processAnimation(animation::land);
+                player_entity.lock()->getAnimationHandling()->processAnimation("land");
             }
         }
     }
@@ -418,8 +416,8 @@ void world::collisionHandler::respawn() {
     player_entity.lock()->reset();
 }
 
-void world::animationHandler::processAnimation(animation animationID) {
-    observer->startAnimation(animationID);
+void world::animationHandler::processAnimation(std::string animation) {
+    observer->startAnimation(animation);
 }
 
 void world::animationHandler::setAnimationCameras(std::shared_ptr<world::animationObserver> _observer,

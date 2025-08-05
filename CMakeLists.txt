@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(littlegame)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 # Find SFML package
 find_package(SFML 2.5 COMPONENTS system window graphics network audio REQUIRED)
@@ -27,6 +27,7 @@ if(USE_VERSION_A)  # version with library
             levelEditor.cpp
             visual_source_files/button.cpp
             main_source_files/levelEditorApp.cpp
+            visual_source_files/animationLibrary.cpp
 
     )
 else() # version without library
@@ -51,6 +52,7 @@ else() # version without library
             world_source_files/levelEditor.cpp
             visual_source_files/button.cpp
             main_source_files/levelEditorApp.cpp
+            visual_source_files/animationLibrary.cpp
     )
 endif()
 
