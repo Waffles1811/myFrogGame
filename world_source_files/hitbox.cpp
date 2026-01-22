@@ -83,6 +83,11 @@ float world::rectHitbox::getUpY(){
 float world::rectHitbox::getDownY(){
     return y - height;
 }
+void world::rectHitbox::changeDimensions(float newLength, float newHeight){
+    length = newLength;
+    height = newHeight;
+}
+
 
 world::point::point(float _x, float _y) : x(_x), y(_y) {}
 

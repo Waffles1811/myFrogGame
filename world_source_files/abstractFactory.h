@@ -9,11 +9,11 @@
 namespace world {
     class abstractFactory {
     public:
-        virtual world::entity *produceEntity() = 0;
+        virtual entity *produceEntity() = 0;
 
-        virtual std::shared_ptr<world::player> producePlayer(float x, float y, int layer, float scale) = 0;
-        virtual std::shared_ptr<world::stationaryObject> produceObject(std::string& type, float x, float y, int layer, float scale) = 0;
-        virtual std::shared_ptr<world::stationaryObject> produceWall(std::string& type, float x, float y, int layer, float scale) = 0;
+        virtual std::shared_ptr<player> producePlayer(float x, float y, int layer, float scale) = 0;
+        virtual std::shared_ptr<stationaryObject> produceObject(std::string& type, float x, float y, int layer, float scale) = 0;
+        virtual std::shared_ptr<stationaryObject> produceWall(std::string& type, float x, float y, int layer, float scale) = 0;
 
     };
 }

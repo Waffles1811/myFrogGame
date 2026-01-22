@@ -34,6 +34,7 @@ namespace world {
         float getRightX();
         float getUpY();
         float getDownY();
+        void changeDimensions(float newLength, float newHeight);
     };
 
     class point{

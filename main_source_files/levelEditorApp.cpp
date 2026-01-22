@@ -34,22 +34,39 @@ void levelEditorApp::processInputs() {
                 break;
             case sf::Event::MouseButtonPressed:
                 for (auto i : buttons){
-                    if (i->getClicked(event.mouseButton.x, event.mouseButton.y)){
+                    if (i->getClicked(event.mouseButton.x, event.mouseButton.y)) {
                         buttonPressed = true;
-                        switch (i->getType()){
+                        switch (i->getType()) {
                             case buttonType::save:
                                 std::ofstream file("newRoom.room");
                                 uint32_t objectCount = objects.size();
-                                file.write(reinterpret_cast<const char*>(&objectCount), sizeof(objectCount));
-                                file.write(reinterpret_cast<const char*>(objects.data()), sizeof(saveFileObject) * objects.size());
+                                file.write(reinterpret_cast<const char *>(&objectCount), sizeof(objectCount));
+                                file.write(reinterpret_cast<const char *>(objects.data()),
+                                           sizeof(saveFileObject) * objects.size());
                                 file.close();
                                 break;
                         }
                     }
                 }
                 if (not buttonPressed){
-                    if( std::shared_ptr<world::entity> newEntity = editor->processClick(event.mouseButton.x, event.mouseButton.y, curLayer, curScale)){
-                        objects.push_back(saveFileObject(newEntity->getXCoord(), newEntity->getYCoord(), curScale, curLayer, newEntity->getID()));
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        if( std::shared_ptr<world::entity> newEntity = editor->processClick(event.mouseButton.x, event.mouseButton.y, curLayer, curScale)){
+                            objects.push_back(saveFileObject(newEntity->getXCoord(), newEntity->getYCoord(), curScale, curLayer, newEntity->getID()));
+                        }
+                    } else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)){
+                        float x = event.mouseButton.x;
+                        float y = -event.mouseButton.y;
+                        auto dim = (editor->processRClick(x, y, curLayer));
+                        if (dim.first!=0 or dim.second!=0) {
+                            for (int j = 0; j < objects.size(); j++) {
+                                auto i = objects[j];
+                                if (i.getX() < x and i.getX() + dim.first > x and
+                                    i.getY() > y and i.getY() - dim.second < y) {
+                                    objects.erase(objects.begin() + j);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
                 break;

@@ -21,6 +21,7 @@ namespace world {
         virtual ~animationObserver() = default;
 
         virtual void startAnimation(std::string anim) = 0;
+        virtual void changeDefaultAnimation(std::string newDefaultAnim) = 0;
     };
 
     class orientationObserver {

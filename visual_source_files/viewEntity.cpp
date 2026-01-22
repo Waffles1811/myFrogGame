@@ -18,29 +18,11 @@ repr::viewEntity::viewEntity(std::string& _type, std::string& folder, float _sca
     curDirection = false;
 }
 
-void repr::viewEntity::defaultTexture(){
-    if (!texture->loadFromFile("assets/" +  type + "/" + type + "_default.png")) {
-        throw std::runtime_error(
-                type + " texture file failed to load.\nPlease ensure"
-                        " assets/" +  type + "/" + type + "_default.png is present");
-    }
-    spriteRect.width = texture->getSize().x;
-    if (curDirection) {
-        sprite->setPosition(sprite->getPosition().x - (leftXOffset-spriteRect.width) * scale, sprite->getPosition().y - yOffset * scale);
-    } else {
-        sprite->setPosition(sprite->getPosition().x - rightXOffset * scale, sprite->getPosition().y - yOffset * scale);
-
-    }
-    spriteRect.top = spriteRect.left = rightXOffset = yOffset = 0;
-    spriteRect.height = texture->getSize().y;
-    sprite->setTextureRect(spriteRect);
-    leftXOffset = spriteRect.width;
- }
-
 sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float time) {
     if (animationHandling) {
         animationHandling->updateAnimation(time);
     }
+    calcLocation();
     return *sprite;
 }
 
@@ -68,20 +50,17 @@ void repr::viewEntity::setOffsets(int _leftXOffset, int _rightXOffset, int _yOff
 
 void repr::viewEntity::changeOrientation(){
     if (curDirection) {
-        sprite->setPosition(sprite->getPosition().x + rightXOffset * scale, sprite->getPosition().y);
+        sprite->setPosition(sprite->getPosition().x + rightXOffset * scale, sprite->getPosition().y + yOffset * scale);
     } else {
-        sprite->setPosition(sprite->getPosition().x + leftXOffset * scale , sprite->getPosition().y);
+        sprite->setPosition(sprite->getPosition().x + leftXOffset * scale , sprite->getPosition().y + yOffset * scale);
     }
     sprite->scale(-1, 1);
     curDirection = !curDirection;
 }
 
 void repr::viewEntity::updatePosition(float newX, float newY){
-    if (curDirection) {
-        sprite->setPosition(newX + leftXOffset * scale , newY + yOffset * scale);
-    } else {
-        sprite->setPosition(newX + rightXOffset * scale, newY + yOffset * scale);
-    }
+    x = newX;
+    y = newY;
 }
 
 void repr::viewEntity::startAnimation(std::string anim) {
@@ -93,57 +72,53 @@ void repr::viewEntity::initialiseAnimations(std::shared_ptr<animationLibrary> _l
 
 }
 
+void repr::viewEntity::setNewDefaultAnim(std::string newDefaultAnim){
+    animationHandling->setNewDefault(newDefaultAnim);
+}
+
+void repr::viewEntity::calcLocation(){
+    if (curDirection) {
+        sprite->setPosition(x + leftXOffset * scale , y + yOffset * scale);
+    } else {
+        sprite->setPosition(x + rightXOffset * scale, y + yOffset * scale);
+    }
+}
+
 repr::animationHandler::animationHandler(std::string & _type, const std::shared_ptr<viewEntity> _sprite,
-                                         std::shared_ptr<animationLibrary> _library) : library(_library){
+                                         std::shared_ptr<animationLibrary> _library) : library(_library), wallAnimations(false), defaultAnim("default"){
     sprite = _sprite;
-    inAnimation = repeatingAnimation = false;
+    repeatingAnimation = false;
     timeSinceLastFrame = 0.0;
     xOffset = curX = curY = curFrame = 0;
     curAnimation = "default";
     type = _type;
+    frameDurations = {1000000};
 }
 
 
 
-void repr::animationHandler::updateAnimation(float time) {
-    if (curAnimation == "default"){ // if the animation should end we'll complete it first (unless if another animation has been started)
-        if (inAnimation){
-            repeatingAnimation = false;
-            if (curFrame > 1) {
-                continueAnimation(time);
-            } else {
-                stopAnimation();
-            }
-        }
-    } else {
-        if (inAnimation) {
-            continueAnimation(time);
-        }
-    }
+void repr::animationHandler::updateAnimation(float time) { 
+    continueAnimation(time);
 }
 
 
 void repr::animationHandler::startAnimation(std::string animType){
-    if (animType != "fall" and animType != "land" and animType != "walk" and animType != "jump"){
-        curAnimation = animType;
-    }
-    else {
-        auto data = library->getAnimation(type, animType);
-        std::string filename = data["file"];
-        frameDurations.erase(frameDurations.begin(), frameDurations.end());
-        frameDurations = data["frameDurations"].get<std::vector<float>>();
-        curX = data["startXOffset"];
-        curY = data["startYOffset"];
-        xOffset = data["xOffset"];
-        repeatingAnimation = data["repeating"];
-        curFrame = 0;
-        inAnimation = true;
-        sprite.lock()->setTexture(filename, xOffset, data["ySize"]);
-        sprite.lock()->setTextureBox(curX, curY);
-        sprite.lock()->setOffsets(data["LDisplayXOffset"], data["RDisplayXOffset"], data["displayYOffset"]);
-        curAnimation = animType;
-        timeSinceLastFrame = 0;
-    }
+    auto data = library->getAnimation(type, animType);
+    std::string filename = data["file"]; // file with the spritesheet
+    frameDurations.erase(frameDurations.begin(), frameDurations.end());
+    frameDurations = data["frameDurations"].get<std::vector<float>>(); // how long every frame should stay on screen
+    curX = data["startXOffset"]; // where in the spritesheet the animation starts, frame (from zero) * frame width (for horizontal spritesheet)
+    curY = data["startYOffset"]; // where in the spritesheet the animation starts, frame (from zero) * frame height (for vertical spritesheet)
+    xOffset = data["xOffset"]; // width of one frame
+    repeatingAnimation = data["repeating"]; // wether or not the animation should repeat when finished
+    curFrame = 0;
+    sprite.lock()->setTexture(filename, xOffset, data["ySize"]); // ySize is how high the sprite is
+    sprite.lock()->setTextureBox(curX, curY);
+    sprite.lock()->setOffsets(data["LDisplayXOffset"], data["RDisplayXOffset"], data["displayYOffset"]);
+    // some animations have some extra space somewhere because the thing is moving around, sprite is kept in correct position by these
+    // LDisplay if for if thing is facing left and RDisplay is for facing right
+    timeSinceLastFrame = 0;
+    curAnimation = animType;
 }
 
 void repr::animationHandler::continueAnimation(float time){
@@ -157,7 +132,9 @@ void repr::animationHandler::continueAnimation(float time){
     }
     if (curFrame > frameDurations.size()-1){ // if last frame has passed
         if (repeatingAnimation){
-            startAnimation(curAnimation);
+            curX -= curFrame * xOffset;
+            curFrame = 0;
+            sprite.lock()->setTextureBox(curX, curY);
         } else {
             stopAnimation();
         }
@@ -165,7 +142,37 @@ void repr::animationHandler::continueAnimation(float time){
 }
 
 void repr::animationHandler::stopAnimation() {
-    sprite.lock()->defaultTexture();
-    inAnimation = false;
+    defaultTexture();
 }
 
+void repr::animationHandler::setNewDefault(std::string newDefaultAnim){
+    if (curAnimation == defaultAnim){
+        defaultAnim = newDefaultAnim;
+        startAnimation(defaultAnim);
+    } else {
+        defaultAnim = newDefaultAnim;
+    }
+}
+
+
+void repr::animationHandler::defaultTexture(){
+    /*
+    if (!texture->loadFromFile("assets/" +  type + "/" + type + "_default.png")) {
+        throw std::runtime_error(
+                type + " texture file failed to load.\nPlease ensure"
+                        " assets/" +  type + "/" + type + "_default.png is present");
+    }
+    spriteRect.width = texture->getSize().x;
+    if (curDirection) {
+        sprite->setPosition(sprite->getPosition().x - (leftXOffset-spriteRect.width) * scale, sprite->getPosition().y - yOffset * scale);
+    } else {
+        sprite->setPosition(sprite->getPosition().x - rightXOffset * scale, sprite->getPosition().y - yOffset * scale);
+
+    }
+    spriteRect.top = spriteRect.left = rightXOffset = yOffset = 0;
+    spriteRect.height = texture->getSize().y;
+    sprite->setTextureRect(spriteRect);
+    leftXOffset = spriteRect.width;
+    */
+   startAnimation(defaultAnim);
+}

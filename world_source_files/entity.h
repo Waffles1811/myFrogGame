@@ -24,6 +24,7 @@ namespace world {
     protected:
         float x;
         float y;
+        int layer;
         objectID type;
         std::shared_ptr<entitycamera> positionCamera;
         std::shared_ptr<world::rectHitbox> hitbox;
@@ -33,12 +34,13 @@ namespace world {
         entity(float _x, float _y);
         float getXCoord() const;
         float getYCoord() const;
+        int getLayer() const;
         objectID getID() const;
         void setXCoord(float _x);
         void setYCoord(float _y);
         void setCoords(float, float);
         std::shared_ptr<world::rectHitbox> getHitbox();
-        void setpCam(std::shared_ptr<entitycamera> newCam);
+        void setpCam(std::shared_ptr<entitycamera> newCam, int layer);
         virtual void timeUp(float time) = 0;
         virtual int handleCollision(int id);
     };

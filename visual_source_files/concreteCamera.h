@@ -31,6 +31,7 @@ namespace repr {
 
         void startAnimation(std::string anim) override;
         void stopAnimation();
+        void changeDefaultAnimation(std::string newDefaultAnim) override;
     };
 
     class concreteOrientationObserver : public  world::orientationObserver {

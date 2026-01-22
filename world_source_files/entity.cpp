@@ -10,9 +10,10 @@ world::entity::entity(std::shared_ptr<world::rectHitbox> _hitbox, float _x, floa
         : hitbox(std::move(_hitbox)), x(_x), y(_y){}
 world::entity::entity(float _x, float _y) : x(_x), y(_y){}
 
-void world::entity::setpCam(std::shared_ptr<entitycamera> newCam){
+void world::entity::setpCam(std::shared_ptr<entitycamera> newCam, int _layer){
     positionCamera = std::move(newCam);
     positionCamera->updateCoords(x, y);
+    layer = _layer;
 }
 
 float world::entity::getXCoord() const {
@@ -53,6 +54,10 @@ void world::entity::setCoords(float _x, float _y){
 
 int world::entity::handleCollision(int id) {
     return id;
+}
+
+int world::entity::getLayer() const {
+    return layer;
 }
 
 

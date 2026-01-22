@@ -28,7 +28,7 @@ std::shared_ptr<world::player> repr::concreteFactory::producePlayer(float x, flo
             std::make_shared<repr::concreteOrientationObserver>(model);
     std::shared_ptr<world::player> player = std::make_shared<world::player>(world::player(x, y));
     player->initialize();
-    player->setpCam(cam);
+    player->setpCam(cam, layer);
     player->setAnimationCameras(obs, orobs);
     playerView->addEntity(model, layer);
     return player;
@@ -42,7 +42,7 @@ std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceObject(st
     model->initialiseAnimations(library);
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>(model);
     std::shared_ptr<world::stationaryObject> object = std::make_shared<world::stationaryObject>(objectID::kevin, x, y, 136*scale, 136*scale);
-    object->setpCam(cam);
+    object->setpCam(cam, layer);
     playerView->addEntity(model, layer);
     return object;
 }
@@ -54,7 +54,7 @@ std::shared_ptr<world::stationaryObject> repr::concreteFactory::produceWall(std:
     model->initialiseAnimations(library);
     std::shared_ptr<repr::concreteCamera> cam = std::make_shared<repr::concreteCamera>(model);
     std::shared_ptr<world::stationaryObject> object = std::make_shared<world::stationaryObject>(objectID::rockWall, x, y, 50*scale, 50*scale);
-    object->setpCam(cam);
+    object->setpCam(cam, layer);
     playerView->addEntity(model, layer);
     return object;
 }

@@ -55,7 +55,6 @@ void world::world::loadRoom(std::vector<saveFileObject> objects) {
                 entities.push_back(factory->produceObject(type, i.getX(), i.getY(), i.getLayer(), i.getScale()));
                 break;
             case objectID::rockWall:
-                std::cout << "spawned ";
                 type = "rockWall";
                 entities.push_back(factory->produceWall(type, i.getX(), i.getY(), i.getLayer(), i.getScale()));
                 break;

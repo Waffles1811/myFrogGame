@@ -61,6 +61,7 @@ namespace world {
         float xSpeed;
         float ySpeed;
         std::weak_ptr<player> player_entity;
+        bool facingLeft; // left = true, right = false
         bool goingLeft;
         bool goingRight;
         bool facingUp;
@@ -122,15 +123,19 @@ namespace world {
     };
 
     class animationHandler{ // maybe change the hitbox in certain scenarios idk
+        float blockNewAnimationTimer;
         std::shared_ptr<world::animationObserver> observer;
         std::shared_ptr<world::orientationObserver> orientationObserver;
     public:
         animationHandler();
         ~animationHandler() = default;
+        void timeUp(float time);
         void processAnimation(std::string animationID);
         void setAnimationCameras(std::shared_ptr<world::animationObserver> _animobserver,
                                 std::shared_ptr<world::orientationObserver> _orientobserver);
         void turn(bool direction);
+        void setAnimationBlock(float time);
+        void newDefaultAnim(std::string name);
     };
 }
 

@@ -5,6 +5,7 @@
 #include "levelEditor.h"
 
 #include <cmath>
+#include <bits/stdc++.h>
 world::levelEditor::levelEditor(std::shared_ptr<abstractFactory> factory) : world(std::move(factory)){}
 
 std::shared_ptr<world::entity> world::levelEditor::processClick(float x, float y, int layer, float scale) {
@@ -25,3 +26,16 @@ std::shared_ptr<world::entity> world::levelEditor::processClick(float x, float y
         return nullptr;
     }
 }
+
+std::pair<float, float> world::levelEditor::processRClick(float x, float y, int layer) {
+    for (int j = 0; j < entities.size() ; j++){
+        auto i = entities[j];
+        if (i->getLayer() <= layer and i->getHitbox()->getLeftX() < x and i->getHitbox()->getRightX() > x and
+        i->getHitbox()->getUpY() > y and i->getHitbox()->getDownY() < y){
+            entities.erase(entities.begin() + j);
+            return {i->getHitbox()->length, i->getHitbox()->height};
+        }
+    }
+    return {0, 0};
+}
+

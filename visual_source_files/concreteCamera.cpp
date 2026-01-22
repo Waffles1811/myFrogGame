@@ -14,7 +14,6 @@ repr::concreteCamera::concreteCamera(std::shared_ptr<viewEntity> _model) : model
 
 void repr::concreteAnimationObserver::startAnimation(std::string newAnimation) {
     if (curAnimation != newAnimation){
-        std::cout << newAnimation << std::endl;
         model->startAnimation(newAnimation);
         curAnimation = newAnimation;
     }
@@ -24,9 +23,8 @@ repr::concreteAnimationObserver::concreteAnimationObserver(std::shared_ptr<viewE
     curAnimation == "default";
 }
 
-void repr::concreteAnimationObserver::stopAnimation() {
-    curAnimation == "default";
-    model->startAnimation(curAnimation);
+void repr::concreteAnimationObserver::changeDefaultAnimation(std::string newDefaultAnim){
+    model->setNewDefaultAnim(newDefaultAnim);
 }
 
 void repr::concreteOrientationObserver::turn(bool direction) {

@@ -13,23 +13,31 @@ view::view() : entities(11){
 
 void view::makeFrame(float xDimension, float yDimension, float time) {
     for(auto & layerVector : entities){
-        for (auto & entity : layerVector) {
-            window->draw(entity->getSprite(xDimension, yDimension, time)); // draws sprites
+        for (int entity = 0 ; entity < layerVector.size() ; entity++) {
+            if (layerVector[entity].lock()){
+                window->draw(layerVector[entity].lock()->getSprite(xDimension, yDimension, time)); // draws sprites
+            } else {
+                layerVector.erase(layerVector.begin() + entity);
+            }
         }
     }
-    for (auto & button : buttons){
-        window->draw(button->getSprite(xDimension, yDimension, time)); // draws sprites
-    }
+    for (int button = 0 ; button < buttons.size() ; button++) {
+        if (buttons[button].lock()){
+            window->draw(buttons[button].lock()->getSprite(xDimension, yDimension, time)); // draws sprites
+        } else {
+            buttons.erase(buttons.begin() + button);
+        }
+    } 
 
     window->display(); // ends frame
     window->clear();   // clears window for next frame (internally, not on screen)
 }
 
-void view::addEntity(std::shared_ptr<viewEntity> _entity, int layer) {
+void view::addEntity(std::weak_ptr<viewEntity> _entity, int layer) {
     entities[layer].push_back(_entity);
 }
 
-void view::addButton(std::shared_ptr<button> newButton) {
+void view::addButton(std::weak_ptr<button> newButton) {
     buttons.push_back(newButton);
 }
 

@@ -19,7 +19,9 @@ namespace repr {
         int leftXOffset; // sometime animations need us to add an offset since the left top corner might change
         int rightXOffset;
         int yOffset;
-        bool curDirection;
+        bool curDirection; // true = left
+        float x;
+        float y;
     public:
         viewEntity(std::string& _type, std::string& folder, float _scale);
         void initialiseAnimations(std::shared_ptr<animationLibrary> _library);
@@ -27,10 +29,11 @@ namespace repr {
         void setTextureBox(int newX, int newY);
         void setTexture(std::string& _texture, float newLength, float newHeight);
         void setOffsets(int leftXOffset, int rightXOffset, int yOffset);
-        void defaultTexture();
         void updatePosition(float newX, float NewY);
         void changeOrientation();
         void startAnimation(std::string anim);
+        void setNewDefaultAnim(std::string newDefaultAnim);
+        void calcLocation();
         };
 
     class animationHandler{
@@ -46,14 +49,18 @@ namespace repr {
         int curX; // where in the sprite sheet we are now
         int curY;
         int xOffset; // how many pixels we have to move for next sprite
-        bool inAnimation;
         bool repeatingAnimation;
+        bool wallAnimations;
+        std::string defaultAnim;
     public:
         animationHandler(std::string& _type, const std::shared_ptr<viewEntity>, std::shared_ptr<animationLibrary> _library);
         void updateAnimation(float time);
         void startAnimation(std::string type);
         void continueAnimation(float time);
         void stopAnimation();
+        void setNewDefault(std::string newDefaultAnim);
+        void defaultTexture();
+
     };
 } // repr
 

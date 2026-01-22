@@ -18,7 +18,6 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 6. [ ] edge-nudging
 7. [x] improve jumping with variable jump height and faster falling
 8. [ ] apex modifier
-9. [ ] tongue pulling
 
 ### design:
 1. [X] Figure out a way to handle textures (json)
@@ -27,7 +26,7 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 
 ### level-editor:
 1. [X] placing things
-2. [ ] removing things
+2. [X] removing things
 3. [ ] undo
 4. [ ] redo
 5. [ ] moving camera around
@@ -43,21 +42,24 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 1. [ ] move around
 2. [ ] make it damp
 
-#### animations:
+### basic animations:
 1. [X] left and right        
 2. [ ] grabbing             
 3. [ ] dash                 
 4. [x] walk                    
 5. [x] jump and fall    
-6. [ ] tongue pulling
+6. [-] wall climbing, some of it is there but it doesn't look very good
 
-#### sound:
+### sound:
 1. [ ] background  
 2. [ ] walk   
 3. [ ] dash    
 4. [ ] walk        
 5. [ ] jump      
-6. [ ] tongue pulling
 
 ## known bugs:
-1. [FIXED] character texture disappears when animation is over for a short time
+-re add that animations plays out before going back to default
+-when dashin up into a platform, you fall down very slowly for some reason, I think the player is sort off stuck in the platform
+
+## Ideas:
+1. need to stay wet, drying out weakens physical and magical ability or kills you or something

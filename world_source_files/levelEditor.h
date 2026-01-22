@@ -10,6 +10,7 @@ namespace world {
     public:
         levelEditor(std::shared_ptr<abstractFactory>);
         std::shared_ptr<entity> processClick(float x, float y, int layer, float scale);
+        std::pair<float, float> processRClick(float x, float y, int layer);
     };
 }
 

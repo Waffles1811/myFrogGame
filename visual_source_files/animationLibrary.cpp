@@ -23,8 +23,6 @@ void animationLibrary::readFolder(std::string folderPath) {
         std::string type = data["type"];
         for (auto i = data.begin(); i != data.end(); i++) {
             if (i.key() != "type") {
-                std::cout << type << " " << i.key() << std::endl;
-                std:: cout << i.value() << std::endl;
                 library[type][i.key()] = i.value();
             }
         }
