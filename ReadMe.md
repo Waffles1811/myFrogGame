@@ -33,10 +33,18 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 6. [ ] layers
 7. [ ] scale (slider?)
 8. [X] saving levels
+9. [ ] make neighbouring obstacles one hitbox?
+
 
 ## visuals:
 ### interface:
 1. [x] DECIDE UPON A VISUAL THEME: FROG
+2. [ ] some form of debug panel?
+
+### static:
+1. [ ] background (using placeholer from the internet now https://www.deviantart.com/giuz09/art/scene-videogame-forest-wood-pixel-art-820365428 untill I draw one myself)
+2. [ ] some form of spikes
+3. [ ] more like obstacles and shit
 
 ### camera:
 1. [ ] move around
@@ -58,8 +66,8 @@ which is made by pop shop(?): https://pop-shop-packs.itch.io/ \
 5. [ ] jump      
 
 ## known bugs:
--re add that animations plays out before going back to default
--when dashin up into a platform, you fall down very slowly for some reason, I think the player is sort off stuck in the platform
+2. when falling fast and hitting the ground the directional movement can be stopped, I think because it goes slighty into the ground and then thinks there is somethign in front of it, not sure how to fix yet, can be framed as that you're stoppign because you fell from so high
+1. if you time it well you can still glitch trough the ground by dashing down, maybe put player back from where it came when in block, estimating where it came from by using it's speed?
 
 ## Ideas:
 1. need to stay wet, drying out weakens physical and magical ability or kills you or something

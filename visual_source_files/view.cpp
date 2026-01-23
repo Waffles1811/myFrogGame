@@ -9,9 +9,20 @@ view::view() : entities(11){
     window->setPosition(sf::Vector2i(0, 0));  // snap to screen corner
 
     window->setVerticalSyncEnabled(true);
+
+    background = std::make_unique<sf::Sprite>();
+    backgroundTexture = std::make_shared<sf::Texture>();
+    if (!backgroundTexture->loadFromFile("assets/background/temp_background.png")) {
+        throw std::runtime_error(
+                 "background texture file failed to load.\nPlease ensure"
+                        "assets/background/temp_background.png is present");
+    }
+    background->setTexture(*backgroundTexture);
+    background->setScale(2, 2);
 }
 
 void view::makeFrame(float xDimension, float yDimension, float time) {
+    window->draw(*background);
     for(auto & layerVector : entities){
         for (int entity = 0 ; entity < layerVector.size() ; entity++) {
             if (layerVector[entity].lock()){

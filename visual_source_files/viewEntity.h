@@ -24,7 +24,7 @@ namespace repr {
         float y;
     public:
         viewEntity(std::string& _type, std::string& folder, float _scale);
-        void initialiseAnimations(std::shared_ptr<animationLibrary> _library);
+        void initialiseAnimations(std::shared_ptr<animationLibrary> _library, std::string _defaultAnim);
         virtual sf::Sprite getSprite(float xDimension, float yDimension, float time);
         void setTextureBox(int newX, int newY);
         void setTexture(std::string& _texture, float newLength, float newHeight);
@@ -50,10 +50,10 @@ namespace repr {
         int curY;
         int xOffset; // how many pixels we have to move for next sprite
         bool repeatingAnimation;
-        bool wallAnimations;
         std::string defaultAnim;
+        bool inAnimation; // should be false when default animation
     public:
-        animationHandler(std::string& _type, const std::shared_ptr<viewEntity>, std::shared_ptr<animationLibrary> _library);
+        animationHandler(std::string& _type, const std::shared_ptr<viewEntity>, std::shared_ptr<animationLibrary> _library, std::string _defaultAnim);
         void updateAnimation(float time);
         void startAnimation(std::string type);
         void continueAnimation(float time);

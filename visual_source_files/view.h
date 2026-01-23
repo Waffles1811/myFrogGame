@@ -8,6 +8,8 @@ namespace repr {
     class view {
         std::vector<std::vector<std::weak_ptr<viewEntity>>> entities;
         std::vector<std::weak_ptr<button>> buttons;
+        std::unique_ptr<sf::Sprite> background;
+        std::shared_ptr<sf::Texture> backgroundTexture;
     public:
         std::unique_ptr<sf::RenderWindow> window;
 

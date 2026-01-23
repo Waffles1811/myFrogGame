@@ -67,6 +67,7 @@ namespace world {
         bool facingUp;
         bool facingDown;
 
+        bool touchingCeiling;
         bool grounded;
         bool jumping;
         float jumpingTime;
@@ -103,6 +104,7 @@ namespace world {
         void stopDown();
 
         void jump();
+        void wallJump();
         void stopJump();
         void land(float height);
         void fall();

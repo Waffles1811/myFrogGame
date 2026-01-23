@@ -9,13 +9,14 @@ repr::viewEntity::viewEntity(std::string& _type, std::string& folder, float _sca
     if (!texture->loadFromFile("assets/" +  folder + "/" + _type + "_default.png")) {
         throw std::runtime_error(
                 _type + " texture file failed to load.\nPlease ensure"
-                                                     " assets/" +  folder + "/" + _type + "_default.png is present");
+                                                    " assets/" +  folder + "/" + _type + "_default.png is present");
     }
     spriteRect = sf::IntRect(0, 0, texture->getSize().x, texture->getSize().y);
     sprite = std::unique_ptr<sf::Sprite>(new sf::Sprite(*texture, spriteRect));
     sprite->setScale(scale, scale);
     leftXOffset = rightXOffset = yOffset = 0;
     curDirection = false;
+    
 }
 
 sf::Sprite repr::viewEntity::getSprite(float xDimension, float yDimension, float time) {
@@ -67,9 +68,8 @@ void repr::viewEntity::startAnimation(std::string anim) {
     animationHandling->startAnimation(anim);
 }
 
-void repr::viewEntity::initialiseAnimations(std::shared_ptr<animationLibrary> _library) {
-    animationHandling = std::make_unique<animationHandler>(type, shared_from_this(), _library);
-
+void repr::viewEntity::initialiseAnimations(std::shared_ptr<animationLibrary> _library, std::string defaultAnim) {
+    animationHandling = std::make_unique<animationHandler>(type, shared_from_this(), _library, defaultAnim);
 }
 
 void repr::viewEntity::setNewDefaultAnim(std::string newDefaultAnim){
@@ -85,14 +85,11 @@ void repr::viewEntity::calcLocation(){
 }
 
 repr::animationHandler::animationHandler(std::string & _type, const std::shared_ptr<viewEntity> _sprite,
-                                         std::shared_ptr<animationLibrary> _library) : library(_library), wallAnimations(false), defaultAnim("default"){
+                                         std::shared_ptr<animationLibrary> _library, std::string _defaultAnim) : library(_library), defaultAnim(_defaultAnim){
     sprite = _sprite;
-    repeatingAnimation = false;
-    timeSinceLastFrame = 0.0;
-    xOffset = curX = curY = curFrame = 0;
-    curAnimation = "default";
     type = _type;
-    frameDurations = {1000000};
+    inAnimation = false;
+    startAnimation(_defaultAnim);
 }
 
 
@@ -103,6 +100,10 @@ void repr::animationHandler::updateAnimation(float time) {
 
 
 void repr::animationHandler::startAnimation(std::string animType){
+    if (inAnimation and animType == defaultAnim){
+        repeatingAnimation = false;
+        return;
+    }
     auto data = library->getAnimation(type, animType);
     std::string filename = data["file"]; // file with the spritesheet
     frameDurations.erase(frameDurations.begin(), frameDurations.end());
@@ -119,6 +120,9 @@ void repr::animationHandler::startAnimation(std::string animType){
     // LDisplay if for if thing is facing left and RDisplay is for facing right
     timeSinceLastFrame = 0;
     curAnimation = animType;
+    if (animType != defaultAnim){
+        inAnimation = true;
+    }
 }
 
 void repr::animationHandler::continueAnimation(float time){
@@ -142,6 +146,7 @@ void repr::animationHandler::continueAnimation(float time){
 }
 
 void repr::animationHandler::stopAnimation() {
+    inAnimation = false;
     defaultTexture();
 }
 

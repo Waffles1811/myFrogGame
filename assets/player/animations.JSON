@@ -3,10 +3,10 @@
 
   "default": {
       "file": "player_default.png",
-      "frameDurations": [1000000],
+      "frameDurations": [1],
       "LDisplayXOffset": 0,
       "RDisplayXOffset": 0,
-      "displayYOffset": 0,
+      "displayYOffset": -1,
       "startXOffset": 0,
       "startYOffset" : 0,
       "xOffset" : 23,
@@ -45,7 +45,7 @@
 
   "fall": {
     "file": "player_jump.png",
-    "frameDurations": [1000000],
+    "frameDurations": [1],
     "LDisplayXOffset": 1,
     "RDisplayXOffset": -8,
     "displayYOffset": 0,
@@ -54,7 +54,7 @@
     "xOffset" : 30,
     "yOffset" : 0,
     "ySize": 16,
-    "repeating": false
+    "repeating": true
   },
 
   "wall_walk" : {
@@ -101,7 +101,7 @@
 
   "default_wall_cling": {
     "file": "player_wall_default.png",
-    "frameDurations": [1000000000],
+    "frameDurations": [1],
     "LDisplayXOffset": 1,
     "RDisplayXOffset": 8,
     "displayYOffset": -1,

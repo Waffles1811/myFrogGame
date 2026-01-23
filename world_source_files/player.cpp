@@ -119,6 +119,12 @@ void world::inputHandler::processInput(enum movement input) {
 
 world::inputHandler::inputHandler(std::weak_ptr<playerMovement> _movement) : movement(_movement) {}
 
+world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : player_entity(_player_entity) {
+    grounded = goingLeft = goingRight = facingUp = facingDown = canDash = inDash = wallClinging = jumping = touchingWall = touchingCeiling = false;
+    dashTime = wallClingTime = coyoteTime = jumpingTime = xSpeed = ySpeed = 0.0;
+    dashDirection = 0.0;
+}
+
 void world::playerMovement::timeUp(float time) {
     if (not grounded and not (wallClinging and touchingWall)){
         if (jumping) {
@@ -165,7 +171,7 @@ void world::playerMovement::timeUp(float time) {
     if (jumping){
         //ySpeed = jumpSpeed;
         jumpingTime -= time;
-        if (jumpingTime < 0.0f){
+        if (jumpingTime < 0.0f or touchingCeiling){
             jumping = false;
         }
     }
@@ -189,19 +195,24 @@ void world::playerMovement::timeUp(float time) {
 
     if (wallClinging and touchingWall){
         xSpeed = 0.0f;
-        if (facingUp){
+        if (facingUp and not touchingCeiling){
             player_entity.lock()->getAnimationHandling()->processAnimation("wall_walk");
             ySpeed = 200.0f;
-            grounded = false;
         } else if (facingDown and not grounded){
             ySpeed = -200.0f;
-        } else{
+            touchingCeiling = false;
+        } else{ 
             ySpeed = 0.0f;
         }
         wallClingTime -= time;
         if (wallClingTime < 0.0f){
             wallClinging = false;
         }
+    }
+    if (ySpeed > 5.0f){
+        grounded = false;
+    } else if (ySpeed < -5.0f){
+        touchingCeiling = false;
     }
     player_entity.lock()->getAnimationHandling()->timeUp(time);
     player_entity.lock()->setCoords( player_entity.lock()->getXCoord() + time * xSpeed,
@@ -241,18 +252,23 @@ void world::playerMovement::stopRight(){
 }
 
 void world::playerMovement::boinkHead() {
-    ySpeed = 0;
+    if (ySpeed > 0.0f){
+        ySpeed = 0;
+    }
     inDash = false;
+    touchingCeiling = true;
 }
 
 void world::playerMovement::hitWall(float length, bool left) {
     if ((left and not goingRight) or (not left and not goingLeft)){
+        if (!touchingWall and wallClinging){
+            player_entity.lock()->getAnimationHandling()->newDefaultAnim("default_wall_cling");
+            player_entity.lock()->getHitbox()->changeDimensions(35.0f, 55.0f);
+            player_entity.lock()->getAnimationHandling()->processAnimation("default_wall_cling");
+        }
         xSpeed = 0;
         touchingWall = true;
         player_entity.lock()->setXCoord(length);
-        if (wallClinging){
-            player_entity.lock()->getHitbox()->changeDimensions(23.0f*2.5f, 16.0f*2.5f);
-        }
     } else if ((left and not facingLeft) or (not left and facingLeft)){
         touchingWall = false;
     } 
@@ -264,22 +280,25 @@ void world::playerMovement::hitWall(float length, bool left) {
 void world::playerMovement::noWall() {
     touchingWall = false;
     if (wallClinging){
-        player_entity.lock()->getHitbox()->changeDimensions(23.0f*2.5f, 16.0f*2.5f);
+        player_entity.lock()->getHitbox()->changeDimensions(55.0f, 35.0f);
     }
 }
 
 void world::playerMovement::clingToWall() {
     if (wallClingTime > 0) {
         wallClinging = true;
-        player_entity.lock()->getHitbox()->changeDimensions(16.0f * 2.5f, 23.0f * 2.5f);
         if (touchingWall){
+            player_entity.lock()->getHitbox()->changeDimensions(35.0f, 55.0f);
             if (grounded){
                     player_entity.lock()->getAnimationHandling()->processAnimation("touch_wall");
                     player_entity.lock()->getAnimationHandling()->setAnimationBlock(0.350);
                     player_entity.lock()->setCoords( player_entity.lock()->getXCoord(),
-                            player_entity.lock()->getYCoord() + 7.0f*2.5f);  //player moves up a bit for hitbox
+                            player_entity.lock()->getYCoord() + 7.0f);  //player moves up a bit for hitbox
             }
-            player_entity.lock()->getHitbox()->changeDimensions(16.0f * 2.5f, 23.0f * 2.5f);
+            if (ySpeed > 0.0f){
+                player_entity.lock()->getAnimationHandling()->processAnimation("fall");
+            }
+            player_entity.lock()->getHitbox()->changeDimensions(35.0f, 55.0f);
             player_entity.lock()->getAnimationHandling()->newDefaultAnim("default_wall_cling");
             player_entity.lock()->getAnimationHandling()->processAnimation("default_wall_cling");
         }
@@ -290,7 +309,7 @@ void world::playerMovement::releaseWall() {
     wallClinging = false;
     player_entity.lock()->getAnimationHandling()->newDefaultAnim("default");
     if (touchingWall){
-        player_entity.lock()->getHitbox()->changeDimensions(23.0f*2.5f, 16.0f*2.5f);
+        player_entity.lock()->getHitbox()->changeDimensions(55.0f, 35.0f);
     }
 }
 
@@ -317,10 +336,11 @@ void world::playerMovement::stopDown(){
 void world::playerMovement::jump(){
     if (grounded or coyoteTime>0){
         jumping = true;
-        jumpingTime = (float) jumpTime/100.0;
-        grounded = false;
+        jumpingTime = (float) jumpTime/100.0f;
         ySpeed = jumpSpeed;
         player_entity.lock()->getAnimationHandling()->processAnimation("jump");
+    } else if (touchingWall and wallClinging){
+        wallJump();
     } else {
         jumpBufferTime = 0.1;
     }
@@ -328,6 +348,21 @@ void world::playerMovement::jump(){
 
 void world::playerMovement::stopJump() {
     jumping = false;
+}
+
+void world::playerMovement::wallJump(){
+    touchingWall = false;
+    jumping = true;
+    jumpingTime = (float) jumpingTime/100.0f;
+    ySpeed = sin(3.14/6.0) * jumpSpeed;
+    if (facingLeft){
+        xSpeed = cos(3.14/5.0) * jumpSpeed;
+    } else {
+        xSpeed = -cos(3.14/5.0) * jumpSpeed;
+
+    }
+    player_entity.lock()->getHitbox()->changeDimensions(55.0f, 35.0f);
+
 }
 
 void world::playerMovement::land(float height) {
@@ -375,15 +410,16 @@ void world::playerMovement::dash(){
     inDash = true;
     dashTime = 0.3;
     if (facingUp){
-        grounded = false;
         if (goingLeft){
             dashDirection = 5.0;
         }
         else if (goingRight){
             dashDirection = 7.0;
         }
-        else {
+        else if (not touchingCeiling) {
             dashDirection = 6.0;
+        } else {
+            dashTime = 0.0f;
         }
     }
     else if (facingDown){
@@ -393,11 +429,14 @@ void world::playerMovement::dash(){
         else if (goingRight){
             dashDirection = 1.0;
         }
-        else {
+        else if (not grounded) {
             dashDirection = 2.0;
         }
+        else {
+            dashTime = 0.0f;
+        }
     }
-    else if (goingRight){
+    else if (!facingLeft){
         dashDirection = 0.0;
     }
     else{
@@ -422,12 +461,6 @@ void world::playerMovement::endDash(){
     else if (xSpeed < -1){
         xSpeed = -150;
     }
-}
-
-world::playerMovement::playerMovement(std::weak_ptr<player> _player_entity) : player_entity(_player_entity) {
-    grounded = goingLeft = goingRight = facingUp = facingDown = canDash = inDash = wallClinging = jumping = touchingWall = false;
-    dashTime = wallClingTime = coyoteTime = jumpingTime = xSpeed = ySpeed = 0.0;
-    dashDirection = 0.0;
 }
 
 void world::playerMovement::reset() {
